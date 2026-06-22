@@ -574,13 +574,17 @@
         }
 
         function getFormData() {
+            let parsedSales = Number(salesInput.value.replace(/,/g, ''));
+            // Hỗ trợ trường hợp ô doanh số chính là số âm nếu người dùng trực tiếp sửa
+            if (isNaN(parsedSales)) parsedSales = 0;
+
             return {
                 customerId: idInput.value.trim(),
                 taxId: taxIdInput.value.trim(),
                 companyName: companyInput.value.trim(),
                 contactName: contactInput.value.trim(),
                 phone: phoneInput.value.trim(),
-                sales: Number(salesInput.value.replace(/,/g, '')) || 0,
+                sales: parsedSales,
                 notes: notesInput.value.trim()
             };
         }
@@ -591,7 +595,7 @@
             companyInput.value = data.companyName || '';
             contactInput.value = data.contactName || '';
             phoneInput.value = data.phone || '';
-            salesInput.value = data.sales ? data.sales.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '';
+            salesInput.value = data.sales || data.sales === 0 ? data.sales.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '';
             notesInput.value = data.notes || '';
             addSalesInput.value = ''; // Luôn reset ô cộng thêm khi đổ dữ liệu
             addSalesInput.style.borderColor = 'var(--border-color)'; // Reset màu sắc
@@ -676,6 +680,10 @@
             paginatedItems.forEach((customer, index) => {
                 const tr = document.createElement('tr');
                 tr.onclick = () => { setFormData(customer); toggleEditMode(true); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+                
+                // Set color appropriately based on positive or negative sales
+                let salesColor = customer.sales >= 0 ? '#10b981' : '#ef4444';
+                
                 tr.innerHTML = `
                     <td class="text-center"><strong>${startIndex + index + 1}</strong></td>
                     <td class="nowrap" style="color: var(--primary-color); font-weight: bold;">${customer.customerId}</td>
@@ -683,7 +691,7 @@
                     <td><strong>${customer.companyName || '-'}</strong></td>
                     <td class="nowrap">${customer.contactName || '-'}</td>
                     <td class="nowrap">${customer.phone || '-'}</td>
-                    <td class="text-right money nowrap">${formatCurrency(customer.sales)}</td>
+                    <td class="text-right money nowrap" style="color: ${salesColor};">${formatCurrency(customer.sales)}</td>
                     <td>${customer.notes || '-'}</td>
                 `;
                 tableBody.appendChild(tr);
@@ -760,8 +768,7 @@
                         message: `Doanh số gốc của khách hàng <strong>${data.customerId}</strong> đã được <br><strong style="color: #10b981; font-size: 18px;">Tăng thêm ${formatCurrency(addedSales)}</strong>`
                     };
                 } else if (addedSales < 0) {
-                    data.sales += addedSales; // Trừ dồn
-                    if (data.sales < 0) data.sales = 0; // Đảm bảo doanh số không rớt xuống dưới 0
+                    data.sales += addedSales; // Trừ dồn (hệ thống cho phép âm)
                     pendingNotification = {
                         title: 'Thành công!',
                         titleColor: '#ef4444',
@@ -848,6 +855,7 @@
 
             // Dữ liệu từng dòng khách hàng
             data.forEach((c, index) => {
+                let salesColor = c.sales >= 0 ? '#10b981' : '#ef4444';
                 tableBody.push([
                     { text: (index + 1).toString(), alignment: 'center' },
                     { text: c.customerId || '-', color: '#2563eb', bold: true },
@@ -855,7 +863,7 @@
                     { text: c.companyName || '-', bold: true },
                     { text: c.contactName || '-' },
                     { text: c.phone || '-' },
-                    { text: formatCurrency(c.sales), alignment: 'right', color: '#10b981', bold: true },
+                    { text: formatCurrency(c.sales), alignment: 'right', color: salesColor, bold: true },
                     { text: c.notes || '-' }
                 ]);
             });
