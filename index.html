@@ -368,9 +368,16 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="sales">Doanh số KH (VNĐ)</label>
-                        <input type="text" id="sales" class="form-control" placeholder="0">
+                    <!-- Doanh số & Cộng thêm doanh số -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label id="salesLabel" for="sales">Doanh số KH (VNĐ)</label>
+                            <input type="text" id="sales" class="form-control" placeholder="0">
+                        </div>
+                        <div class="form-group" id="addSalesContainer" style="display: none;">
+                            <label for="addSales" style="color: #10b981;">Cập nhật DS (+/-)</label>
+                            <input type="text" id="addSales" class="form-control" placeholder="0" style="border-color: #10b981;">
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -494,7 +501,13 @@
         const companyInput = document.getElementById('companyName');
         const contactInput = document.getElementById('contactName');
         const phoneInput = document.getElementById('phone');
+        
+        // Element Doanh số
+        const salesLabel = document.getElementById('salesLabel');
         const salesInput = document.getElementById('sales');
+        const addSalesContainer = document.getElementById('addSalesContainer');
+        const addSalesInput = document.getElementById('addSales');
+        
         const notesInput = document.getElementById('notes');
         const btnSubmit = document.getElementById('btnSubmit');
         const editActions = document.getElementById('editActions');
@@ -505,10 +518,23 @@
         const btnExportExcel = document.getElementById('btnExportExcel');
         const btnExportPDF = document.getElementById('btnExportPDF');
 
-        salesInput.addEventListener('input', function(e) {
-            let rawValue = this.value.replace(/\D/g, '');
-            this.value = rawValue ? parseInt(rawValue, 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '';
-        });
+        // Định dạng dấu phẩy tự động khi nhập số (hỗ trợ cả dấu âm ở đầu)
+        function formatInputWithCommas(e) {
+            let isNegative = this.value.startsWith('-');
+            let rawValue = this.value.replace(/\D/g, ''); // Loại bỏ tất cả trừ số
+            let formatted = rawValue ? parseInt(rawValue, 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '';
+            
+            if (isNegative && formatted) {
+                this.value = '-' + formatted;
+            } else if (isNegative && !formatted) {
+                this.value = '-'; // Trạng thái đang gõ dở dấu trừ
+            } else {
+                this.value = formatted;
+            }
+        }
+        
+        salesInput.addEventListener('input', formatInputWithCommas);
+        addSalesInput.addEventListener('input', formatInputWithCommas);
 
         function formatCurrency(amount) {
             return Number(amount).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
@@ -534,6 +560,7 @@
             phoneInput.value = data.phone || '';
             salesInput.value = data.sales ? data.sales.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '';
             notesInput.value = data.notes || '';
+            addSalesInput.value = ''; // Luôn reset ô cộng thêm khi đổ dữ liệu
         }
 
         function toggleEditMode(editing) {
@@ -544,6 +571,11 @@
                 editActions.style.display = 'flex';
                 idInput.readOnly = true;
                 idInput.style.backgroundColor = '#f1f5f9';
+                
+                // Hiển thị ô cộng thêm doanh số
+                addSalesContainer.style.display = 'block';
+                salesLabel.innerText = "Doanh số gốc (VNĐ)";
+                addSalesInput.value = '';
             } else {
                 formTitle.innerText = "Thông tin Khách hàng";
                 btnSubmit.style.display = 'block';
@@ -551,6 +583,11 @@
                 idInput.readOnly = false;
                 idInput.style.backgroundColor = '#fff';
                 setFormData({});
+                
+                // Ẩn ô cộng thêm doanh số
+                addSalesContainer.style.display = 'none';
+                salesLabel.innerText = "Doanh số KH (VNĐ)";
+                addSalesInput.value = '';
             }
         }
 
@@ -655,8 +692,29 @@
             } else { proceedWithSave(data, isUpdating); }
         }
 
-        form.addEventListener('submit', function(e) { e.preventDefault(); handleSaveAction(getFormData(), false); });
-        btnUpdate.addEventListener('click', function() { handleSaveAction(getFormData(), true); });
+        form.addEventListener('submit', function(e) { 
+            e.preventDefault(); 
+            handleSaveAction(getFormData(), false); 
+        });
+
+        // Xử lý Cập nhật (bao gồm cộng/trừ dồn doanh số nếu có)
+        btnUpdate.addEventListener('click', function() { 
+            const data = getFormData();
+            
+            // Lấy giá trị từ ô "Cập nhật doanh số (+/-)"
+            const addedSalesStr = addSalesInput.value.replace(/,/g, '');
+            
+            if (addedSalesStr !== '-' && addedSalesStr !== '') {
+                const addedSales = Number(addedSalesStr) || 0;
+                if (addedSales !== 0) {
+                    data.sales += addedSales; // Cộng dồn (nếu là số âm sẽ tự trừ)
+                    if (data.sales < 0) data.sales = 0; // Đảm bảo doanh số không rớt xuống dưới 0
+                }
+            }
+            
+            handleSaveAction(data, true); 
+        });
+
         btnConfirmWarning.addEventListener('click', function() { if (pendingActionData) proceedWithSave(pendingActionData.data, pendingActionData.isUpdating); warningModal.style.display = 'none'; pendingActionData = null; });
         btnCancelWarning.addEventListener('click', function() { warningModal.style.display = 'none'; pendingActionData = null; });
         btnDelete.addEventListener('click', function() { const id = idInput.value.trim(); customerToDelete = id; deleteModalMessage.innerHTML = `Bạn có chắc chắn muốn xóa khách hàng <strong>"${id}"</strong> không?`; deleteModal.style.display = 'flex'; });
