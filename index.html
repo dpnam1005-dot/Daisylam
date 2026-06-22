@@ -715,10 +715,11 @@
 
             // Tạo một container ẩn để render giao diện bảng xuất ra PDF
             const container = document.createElement('div');
-            container.style.padding = '10px';
+            container.style.padding = '20px';
             container.style.fontFamily = 'Arial, sans-serif';
-            // BÍ QUYẾT: Cố định width để thư viện tự động scale vừa khít trang A4 ngang, không bị cắt lẹm
-            container.style.width = '1100px'; 
+            // Cố định width bằng đúng mức giấy A4 ngang để tự scale khít
+            container.style.width = '1050px'; 
+            container.style.backgroundColor = '#ffffff';
             
             const title = document.createElement('h2');
             title.innerText = 'Bảng Xếp hạng Doanh số Khách hàng';
@@ -729,20 +730,23 @@
 
             const table = document.createElement('table');
             table.style.width = '100%';
+            // Ép bảng giữ nguyên tỷ lệ, nội dung nào dài quá tự xuống dòng
+            table.style.tableLayout = 'fixed'; 
             table.style.borderCollapse = 'collapse';
-            table.style.fontSize = '11px'; // Chỉnh nhỏ font một chút để vừa vặn
+            table.style.fontSize = '12px'; 
             
             const thead = document.createElement('thead');
+            // Chia tỷ lệ phần trăm các cột để luôn cân đối trên mọi dữ liệu
             thead.innerHTML = `
                 <tr>
-                    <th style="border: 1px solid #e2e8f0; padding: 6px; text-align: center; background-color: #f8fafc; width: 40px;">STT</th>
-                    <th style="border: 1px solid #e2e8f0; padding: 6px; text-align: left; background-color: #f8fafc;">Mã KH</th>
-                    <th style="border: 1px solid #e2e8f0; padding: 6px; text-align: left; background-color: #f8fafc;">MST</th>
-                    <th style="border: 1px solid #e2e8f0; padding: 6px; text-align: left; background-color: #f8fafc; width: 220px;">Tên Công ty</th>
-                    <th style="border: 1px solid #e2e8f0; padding: 6px; text-align: left; background-color: #f8fafc;">Người LH</th>
-                    <th style="border: 1px solid #e2e8f0; padding: 6px; text-align: left; background-color: #f8fafc;">SĐT</th>
-                    <th style="border: 1px solid #e2e8f0; padding: 6px; text-align: right; background-color: #f8fafc;">Doanh số (VNĐ)</th>
-                    <th style="border: 1px solid #e2e8f0; padding: 6px; text-align: left; background-color: #f8fafc;">Ghi chú</th>
+                    <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: center; background-color: #f8fafc; width: 5%;">STT</th>
+                    <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; background-color: #f8fafc; width: 14%;">Mã KH</th>
+                    <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; background-color: #f8fafc; width: 10%;">MST</th>
+                    <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; background-color: #f8fafc; width: 23%;">Tên Công ty</th>
+                    <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; background-color: #f8fafc; width: 12%;">Người LH</th>
+                    <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; background-color: #f8fafc; width: 11%;">SĐT</th>
+                    <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: right; background-color: #f8fafc; width: 15%;">Doanh số (VNĐ)</th>
+                    <th style="border: 1px solid #e2e8f0; padding: 8px; text-align: left; background-color: #f8fafc; width: 10%;">Ghi chú</th>
                 </tr>
             `;
             table.appendChild(thead);
@@ -751,14 +755,14 @@
             data.forEach((c, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td style="border: 1px solid #e2e8f0; padding: 6px; text-align: center;">${index + 1}</td>
-                    <td style="border: 1px solid #e2e8f0; padding: 6px;">${c.customerId}</td>
-                    <td style="border: 1px solid #e2e8f0; padding: 6px;">${c.taxId || '-'}</td>
-                    <td style="border: 1px solid #e2e8f0; padding: 6px;">${c.companyName || '-'}</td>
-                    <td style="border: 1px solid #e2e8f0; padding: 6px;">${c.contactName || '-'}</td>
-                    <td style="border: 1px solid #e2e8f0; padding: 6px;">${c.phone || '-'}</td>
-                    <td style="border: 1px solid #e2e8f0; padding: 6px; text-align: right; color: #10b981; font-weight: bold;">${formatCurrency(c.sales)}</td>
-                    <td style="border: 1px solid #e2e8f0; padding: 6px;">${c.notes || '-'}</td>
+                    <td style="border: 1px solid #e2e8f0; padding: 8px; text-align: center; word-wrap: break-word;">${index + 1}</td>
+                    <td style="border: 1px solid #e2e8f0; padding: 8px; word-wrap: break-word;">${c.customerId}</td>
+                    <td style="border: 1px solid #e2e8f0; padding: 8px; word-wrap: break-word;">${c.taxId || '-'}</td>
+                    <td style="border: 1px solid #e2e8f0; padding: 8px; word-wrap: break-word;">${c.companyName || '-'}</td>
+                    <td style="border: 1px solid #e2e8f0; padding: 8px; word-wrap: break-word;">${c.contactName || '-'}</td>
+                    <td style="border: 1px solid #e2e8f0; padding: 8px; word-wrap: break-word;">${c.phone || '-'}</td>
+                    <td style="border: 1px solid #e2e8f0; padding: 8px; text-align: right; color: #10b981; font-weight: bold; word-wrap: break-word;">${formatCurrency(c.sales)}</td>
+                    <td style="border: 1px solid #e2e8f0; padding: 8px; word-wrap: break-word;">${c.notes || '-'}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -769,7 +773,7 @@
                 margin:       10,
                 filename:     'Bang_Xep_Hang_Doanh_So.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
+                html2canvas:  { scale: 2, useCORS: true, windowWidth: 1100 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
