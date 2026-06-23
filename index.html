@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Doanh số Khách hàng</title>
-    <!-- Thêm thư viện xuất Excel (SheetJS) và thư viện mới xuất PDF (pdfmake) -->
+    <!-- Thêm thư viện xuất Excel (SheetJS) và thư viện xuất PDF (pdfmake) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
@@ -35,7 +35,7 @@
         }
 
         .container {
-            max-width: 1600px; /* Tăng từ 1200px lên 1600px để không gian rộng rãi hơn */
+            max-width: 1600px;
             width: 98%;
             margin: 0 auto;
         }
@@ -60,7 +60,7 @@
         .form-section {
             flex: 1;
             min-width: 300px;
-            max-width: 360px; /* Giới hạn độ rộng của form để nhường chỗ tối đa cho bảng */
+            max-width: 360px;
             background: var(--card-bg);
             padding: 20px;
             border-radius: 8px;
@@ -69,7 +69,7 @@
         }
 
         .table-section {
-            flex: 1; /* Để bảng chiếm toàn bộ không gian còn lại */
+            flex: 1;
             min-width: 600px;
             background: var(--card-bg);
             padding: 20px;
@@ -154,27 +154,12 @@
         }
 
         /* Styles cho nút xuất file */
-        .btn-export-excel {
-            background-color: #10b981;
-            color: white;
-        }
-        .btn-export-excel:hover {
-            background-color: #059669;
-        }
-        .btn-import-excel {
-            background-color: #3b82f6;
-            color: white;
-        }
-        .btn-import-excel:hover {
-            background-color: #2563eb;
-        }
-        .btn-export-pdf {
-            background-color: #f59e0b;
-            color: white;
-        }
-        .btn-export-pdf:hover {
-            background-color: #d97706;
-        }
+        .btn-export-excel { background-color: #10b981; color: white; }
+        .btn-export-excel:hover { background-color: #059669; }
+        .btn-import-excel { background-color: #3b82f6; color: white; }
+        .btn-import-excel:hover { background-color: #2563eb; }
+        .btn-export-pdf { background-color: #f59e0b; color: white; }
+        .btn-export-pdf:hover { background-color: #d97706; }
 
         .btn-sm {
             padding: 6px 10px;
@@ -217,7 +202,7 @@
 
         table {
             width: 100%;
-            min-width: 1100px; /* Ép bảng có độ rộng tối thiểu, kích hoạt thanh cuộn ngang nếu màn hình nhỏ */
+            min-width: 1100px;
             border-collapse: collapse;
         }
 
@@ -226,21 +211,12 @@
             text-align: left;
             border-bottom: 1px solid var(--border-color);
             font-size: 14px;
-            vertical-align: middle; /* Căn giữa nội dung theo chiều dọc */
+            vertical-align: middle;
         }
 
-        /* Thêm các class để chống xuống dòng và chia khoảng cách cho bảng */
-        .nowrap {
-            white-space: nowrap;
-        }
-
-        .col-company {
-            min-width: 250px;
-        }
-
-        .col-notes {
-            min-width: 150px;
-        }
+        .nowrap { white-space: nowrap; }
+        .col-company { min-width: 250px; }
+        .col-notes { min-width: 150px; }
 
         th {
             background-color: #f8fafc;
@@ -252,20 +228,15 @@
             cursor: pointer;
         }
 
-        .text-right {
-            text-align: right;
-        }
-
-        .text-center {
-            text-align: center;
-        }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
 
         .money {
             color: #10b981;
             font-weight: bold;
         }
 
-        /* Phân trang (Pagination) Styles */
+        /* Pagination Styles */
         .pagination-container {
             display: flex;
             justify-content: center;
@@ -409,6 +380,7 @@
                 <div class="table-header-flex">
                     <h2>Bảng Xếp hạng Doanh số</h2>
                     <div class="header-actions">
+                        <button type="button" id="btnBulkDelete" class="btn btn-danger btn-sm" style="display: none;">Xóa đã chọn</button>
                         <input type="text" id="searchInput" class="search-box" placeholder="Tìm kiếm khách hàng...">
                         <input type="file" id="fileInputExcel" accept=".xlsx, .xls, .csv" style="display: none;">
                         <button type="button" id="btnImportExcel" class="btn btn-import-excel btn-sm">Nhập Excel</button>
@@ -421,6 +393,7 @@
                     <table>
                         <thead>
                             <tr>
+                                <th class="text-center" style="width: 40px;"><input type="checkbox" id="selectAllCheckbox" style="cursor: pointer; width: 16px; height: 16px;"></th>
                                 <th class="text-center">#</th>
                                 <th class="nowrap">Mã KH</th>
                                 <th class="nowrap">MST</th>
@@ -466,6 +439,18 @@
         </div>
     </div>
 
+    <!-- Modal xác nhận xóa NHIỀU KH -->
+    <div id="bulkDeleteModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color: #ef4444; margin-bottom: 10px;">Xác nhận xóa nhiều</h3>
+            <p id="bulkDeleteModalMessage">Bạn có chắc chắn muốn xóa khách hàng đã chọn không?</p>
+            <div class="modal-actions">
+                <button type="button" id="btnCancelBulkDelete" class="btn btn-secondary">Hủy</button>
+                <button type="button" id="btnConfirmBulkDelete" class="btn btn-danger">Xóa Tất Cả</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal cảnh báo trùng lặp thông tin khác -->
     <div id="warningModal" class="modal-overlay">
         <div class="modal-content">
@@ -494,7 +479,8 @@
         let isEditing = false;
         let pendingCustomerData = null;
         let pendingActionData = null;
-        let pendingNotification = null; // Biến lưu tạm dữ liệu của Pop-up thông báo
+        let pendingNotification = null;
+        let selectedCustomerIds = new Set();
 
         function saveData() {
             localStorage.setItem('customers_data', JSON.stringify(customers));
@@ -530,7 +516,6 @@
         const contactInput = document.getElementById('contactName');
         const phoneInput = document.getElementById('phone');
         
-        // Element Doanh số
         const salesLabel = document.getElementById('salesLabel');
         const salesInput = document.getElementById('sales');
         const addSalesContainer = document.getElementById('addSalesContainer');
@@ -551,27 +536,26 @@
         // Định dạng dấu phẩy tự động và đổi màu khi nhập số
         function formatInputWithCommas(e) {
             let isNegative = this.value.startsWith('-');
-            let rawValue = this.value.replace(/\D/g, ''); // Loại bỏ tất cả trừ số
+            let rawValue = this.value.replace(/\D/g, ''); 
             let formatted = rawValue ? parseInt(rawValue, 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '';
             
             if (isNegative && formatted) {
                 this.value = '-' + formatted;
             } else if (isNegative && !formatted) {
-                this.value = '-'; // Trạng thái đang gõ dở dấu trừ
+                this.value = '-'; 
             } else {
                 this.value = formatted;
             }
 
-            // Đổi màu viền và chữ cho ô cập nhật doanh số (+/-)
             if (this.id === 'addSales') {
                 if (isNegative && formatted) {
-                    this.style.borderColor = '#ef4444'; // Viền đỏ
-                    this.style.color = '#ef4444';       // Chữ đỏ
+                    this.style.borderColor = '#ef4444';
+                    this.style.color = '#ef4444';
                 } else if (!isNegative && formatted) {
-                    this.style.borderColor = '#10b981'; // Viền xanh lá
-                    this.style.color = '#10b981';       // Chữ xanh lá
+                    this.style.borderColor = '#10b981';
+                    this.style.color = '#10b981';
                 } else {
-                    this.style.borderColor = 'var(--border-color)'; // Về mặc định
+                    this.style.borderColor = 'var(--border-color)';
                     this.style.color = 'var(--text-main)';
                 }
             }
@@ -586,7 +570,6 @@
 
         function getFormData() {
             let parsedSales = Number(salesInput.value.replace(/,/g, ''));
-            // Hỗ trợ trường hợp ô doanh số chính là số âm nếu người dùng trực tiếp sửa
             if (isNaN(parsedSales)) parsedSales = 0;
 
             return {
@@ -608,8 +591,8 @@
             phoneInput.value = data.phone || '';
             salesInput.value = data.sales || data.sales === 0 ? data.sales.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '';
             notesInput.value = data.notes || '';
-            addSalesInput.value = ''; // Luôn reset ô cộng thêm khi đổ dữ liệu
-            addSalesInput.style.borderColor = 'var(--border-color)'; // Reset màu sắc
+            addSalesInput.value = ''; 
+            addSalesInput.style.borderColor = 'var(--border-color)';
             addSalesInput.style.color = 'var(--text-main)';
         }
 
@@ -622,11 +605,9 @@
                 idInput.readOnly = true;
                 idInput.style.backgroundColor = '#f1f5f9';
                 
-                // Khóa ô doanh số gốc không cho sửa trực tiếp
                 salesInput.readOnly = true;
                 salesInput.style.backgroundColor = '#f1f5f9';
                 
-                // Hiển thị ô cộng thêm doanh số
                 addSalesContainer.style.display = 'block';
                 salesLabel.innerText = "Doanh số gốc (VNĐ)";
                 addSalesInput.value = '';
@@ -639,13 +620,11 @@
                 idInput.readOnly = false;
                 idInput.style.backgroundColor = '#fff';
                 
-                // Mở khóa ô doanh số khi thêm mới
                 salesInput.readOnly = false;
                 salesInput.style.backgroundColor = '#fff';
                 
                 setFormData({});
                 
-                // Ẩn ô cộng thêm doanh số
                 addSalesContainer.style.display = 'none';
                 salesLabel.innerText = "Doanh số KH (VNĐ)";
                 addSalesInput.value = '';
@@ -693,7 +672,7 @@
             const paginatedItems = filtered.slice(startIndex, startIndex + itemsPerPage);
             tableBody.innerHTML = '';
             if (paginatedItems.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #94a3b8; padding: 30px;">Không có dữ liệu.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #94a3b8; padding: 30px;">Không có dữ liệu.</td></tr>`;
                 paginationContainer.innerHTML = '';
                 return;
             }
@@ -701,10 +680,12 @@
                 const tr = document.createElement('tr');
                 tr.onclick = () => { setFormData(customer); toggleEditMode(true); window.scrollTo({ top: 0, behavior: 'smooth' }); };
                 
-                // Set color appropriately based on positive or negative sales
                 let salesColor = customer.sales >= 0 ? '#10b981' : '#ef4444';
                 
                 tr.innerHTML = `
+                    <td class="text-center" onclick="event.stopPropagation()">
+                        <input type="checkbox" class="row-checkbox" style="cursor: pointer; width: 16px; height: 16px;" data-id="${customer.customerId}" ${selectedCustomerIds.has(customer.customerId) ? 'checked' : ''}>
+                    </td>
                     <td class="text-center"><strong>${startIndex + index + 1}</strong></td>
                     <td class="nowrap" style="color: var(--primary-color); font-weight: bold;">${customer.customerId}</td>
                     <td class="nowrap">${customer.taxId || '-'}</td>
@@ -716,6 +697,7 @@
                 `;
                 tableBody.appendChild(tr);
             });
+            checkSelectAllStatus();
             renderPagination(filtered.length);
         }
 
@@ -746,13 +728,12 @@
                 }
             }
 
-            // Gọi Pop-up thông báo thành công (nếu có cập nhật doanh số)
             if (pendingNotification) {
                 notificationTitle.innerText = pendingNotification.title;
                 notificationTitle.style.color = pendingNotification.titleColor;
                 notificationMessage.innerHTML = pendingNotification.message;
                 notificationModal.style.display = 'flex';
-                pendingNotification = null; // Reset lại
+                pendingNotification = null; 
             }
         }
 
@@ -771,24 +752,21 @@
             handleSaveAction(getFormData(), false); 
         });
 
-        // Xử lý Cập nhật (bao gồm cộng/trừ dồn doanh số nếu có)
         btnUpdate.addEventListener('click', function() { 
             const data = getFormData();
-            
-            // Lấy giá trị từ ô "Cập nhật doanh số (+/-)"
             const addedSalesStr = addSalesInput.value.replace(/,/g, '');
             
             if (addedSalesStr !== '-' && addedSalesStr !== '') {
                 const addedSales = Number(addedSalesStr) || 0;
                 if (addedSales > 0) {
-                    data.sales += addedSales; // Cộng dồn
+                    data.sales += addedSales; 
                     pendingNotification = {
                         title: 'Thành công!',
                         titleColor: '#10b981',
                         message: `Doanh số gốc của khách hàng <strong>${data.customerId}</strong> đã được <br><strong style="color: #10b981; font-size: 18px;">Tăng thêm ${formatCurrency(addedSales)}</strong>`
                     };
                 } else if (addedSales < 0) {
-                    data.sales += addedSales; // Trừ dồn (hệ thống cho phép âm)
+                    data.sales += addedSales; 
                     pendingNotification = {
                         title: 'Thành công!',
                         titleColor: '#ef4444',
@@ -816,8 +794,6 @@
         });
         document.getElementById('btnCancelModal').addEventListener('click', () => { modal.style.display = 'none'; });
         
-        // --- CHỨC NĂNG XUẤT FILE ---
-        // Lấy danh sách đang hiển thị (đã lọc theo tìm kiếm và sắp xếp)
         function getFilteredAndSortedData() {
             const query = searchInput.value.toLowerCase();
             let filtered = customers.filter(c => 
@@ -831,7 +807,6 @@
             return filtered;
         }
 
-        // Xử lý Xuất Excel
         btnExportExcel.addEventListener('click', function() {
             const data = getFilteredAndSortedData();
             if (data.length === 0) return;
@@ -853,15 +828,12 @@
             XLSX.writeFile(wb, "Bang_Xep_Hang_Doanh_So.xlsx");
         });
 
-        // Xử lý Xuất PDF bằng thư viện pdfmake mới (không bị lỗi cắt xén)
         btnExportPDF.addEventListener('click', function() {
             const data = getFilteredAndSortedData();
             if (data.length === 0) return;
 
-            // Khởi tạo bảng cho PDF
             const tableBody = [];
             
-            // Dòng Header
             tableBody.push([
                 { text: 'STT', style: 'tableHeader', alignment: 'center' },
                 { text: 'Mã KH', style: 'tableHeader' },
@@ -873,7 +845,6 @@
                 { text: 'Ghi chú', style: 'tableHeader' }
             ]);
 
-            // Dữ liệu từng dòng khách hàng
             data.forEach((c, index) => {
                 let salesColor = c.sales >= 0 ? '#10b981' : '#ef4444';
                 tableBody.push([
@@ -888,20 +859,17 @@
                 ]);
             });
 
-            // Định dạng bố cục file PDF
             const docDefinition = {
-                pageOrientation: 'landscape', // Khổ giấy ngang
+                pageOrientation: 'landscape', 
                 pageSize: 'A4',
                 content: [
                     { text: 'Bảng Xếp hạng Doanh số Khách hàng', style: 'header' },
                     {
                         table: {
                             headerRows: 1,
-                            // Tỷ lệ % độ rộng các cột cho vừa vặn tờ giấy A4
                             widths: ['5%', '13%', '10%', '24%', '12%', '11%', '15%', '10%'],
                             body: tableBody
                         },
-                        // Style đường viền và màu nền cho bảng
                         layout: {
                             hLineWidth: function (i, node) { return 1; },
                             vLineWidth: function (i, node) { return 1; },
@@ -934,11 +902,9 @@
                 }
             };
 
-            // Tạo và tải file PDF
             pdfMake.createPdf(docDefinition).download('Bang_Xep_Hang_Doanh_So.pdf');
         });
 
-        // --- CHỨC NĂNG NHẬP FILE EXCEL ---
         btnImportExcel.addEventListener('click', function() {
             fileInputExcel.click();
         });
@@ -960,11 +926,9 @@
                     let updatedCount = 0;
 
                     jsonData.forEach(row => {
-                        // Linh hoạt nhận diện tên cột từ file (bao gồm các cột khi xuất ra)
                         const custId = (row["Mã KH"] || row["customerId"] || "").toString().trim();
-                        if (!custId) return; // Bỏ qua dòng không có Mã KH
+                        if (!custId) return; 
 
-                        // Xử lý cột doanh số: loại bỏ dấu phẩy nếu file Excel lưu dạng chuỗi
                         let salesVal = row["Doanh số KH (VNĐ)"] || row["Doanh số (VNĐ)"] || row["Doanh số"] || row["sales"] || 0;
                         if (typeof salesVal === 'string') {
                             salesVal = Number(salesVal.replace(/,/g, '').replace(/\./g, '')) || 0;
@@ -980,7 +944,6 @@
                             notes: (row["Ghi chú"] || row["notes"] || "").toString().trim()
                         };
 
-                        // Cập nhật nếu trùng ID, thêm mới nếu chưa có
                         const existingIndex = customers.findIndex(c => c.customerId.toLowerCase() === custId.toLowerCase());
                         if (existingIndex !== -1) {
                             customers[existingIndex] = newCustomer;
@@ -995,7 +958,6 @@
                     currentPage = 1;
                     renderTable();
 
-                    // Hiển thị thông báo thành công
                     notificationTitle.innerText = "Nhập Excel Thành Công!";
                     notificationTitle.style.color = "#10b981";
                     notificationMessage.innerHTML = `Đã thêm mới: <strong>${importedCount}</strong> khách hàng.<br>Đã cập nhật: <strong>${updatedCount}</strong> khách hàng (do trùng mã).`;
@@ -1009,10 +971,98 @@
                     notificationModal.style.display = 'flex';
                 }
                 
-                // Reset input file để chọn lại được file cũ nếu muốn
                 fileInputExcel.value = '';
             };
             reader.readAsArrayBuffer(file);
+        });
+
+        // --- CHỨC NĂNG XÓA NHIỀU KHÁCH HÀNG ---
+        const btnBulkDelete = document.getElementById('btnBulkDelete');
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const bulkDeleteModal = document.getElementById('bulkDeleteModal');
+        const bulkDeleteModalMessage = document.getElementById('bulkDeleteModalMessage');
+
+        function updateBulkDeleteUI() {
+            if (selectedCustomerIds.size > 0) {
+                btnBulkDelete.style.display = 'inline-block';
+                btnBulkDelete.innerText = `Xóa đã chọn (${selectedCustomerIds.size})`;
+            } else {
+                btnBulkDelete.style.display = 'none';
+            }
+        }
+
+        function checkSelectAllStatus() {
+            if (!selectAllCheckbox) return;
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            if (checkboxes.length === 0) {
+                selectAllCheckbox.checked = false;
+                return;
+            }
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            selectAllCheckbox.checked = allChecked;
+        }
+
+        tableBody.addEventListener('change', function(e) {
+            if (e.target.classList.contains('row-checkbox')) {
+                const id = e.target.dataset.id;
+                if (e.target.checked) {
+                    selectedCustomerIds.add(id);
+                } else {
+                    selectedCustomerIds.delete(id);
+                }
+                updateBulkDeleteUI();
+                checkSelectAllStatus();
+            }
+        });
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function(e) {
+                const isChecked = e.target.checked;
+                const checkboxes = document.querySelectorAll('.row-checkbox');
+                checkboxes.forEach(cb => {
+                    cb.checked = isChecked;
+                    const id = cb.dataset.id;
+                    if (isChecked) {
+                        selectedCustomerIds.add(id);
+                    } else {
+                        selectedCustomerIds.delete(id);
+                    }
+                });
+                updateBulkDeleteUI();
+            });
+        }
+
+        if (btnBulkDelete) {
+            btnBulkDelete.addEventListener('click', () => {
+                bulkDeleteModalMessage.innerHTML = `Bạn có chắc chắn muốn xóa <strong>${selectedCustomerIds.size}</strong> khách hàng đã chọn không? Dữ liệu không thể khôi phục.`;
+                bulkDeleteModal.style.display = 'flex';
+            });
+        }
+
+        document.getElementById('btnCancelBulkDelete')?.addEventListener('click', () => {
+            bulkDeleteModal.style.display = 'none';
+        });
+
+        document.getElementById('btnConfirmBulkDelete')?.addEventListener('click', () => {
+            customers = customers.filter(c => !selectedCustomerIds.has(c.customerId));
+            saveData();
+            
+            // Xóa UI khách hàng đang mở sửa nếu nằm trong danh sách bị xóa
+            const currentEditId = idInput.value.trim();
+            if (currentEditId && selectedCustomerIds.has(currentEditId)) {
+                toggleEditMode(false);
+            }
+            
+            selectedCustomerIds.clear();
+            updateBulkDeleteUI();
+            renderTable();
+            
+            bulkDeleteModal.style.display = 'none';
+            
+            notificationTitle.innerText = "Đã xóa thành công!";
+            notificationTitle.style.color = "#ef4444";
+            notificationMessage.innerHTML = "Các khách hàng được chọn đã bị xóa khỏi hệ thống.";
+            notificationModal.style.display = 'flex';
         });
 
         renderTable();
