@@ -341,10 +341,10 @@
                         <select id="classification" class="form-control">
                             <option value="">-- Chưa phân loại --</option>
                             <option value="Khách mới">Khách mới (Xanh dương)</option>
-                            <option value="Khách tiềm năng">Khách tiềm năng (Hồng)</option>
+                            <option value="Chưa liên hệ được">Chưa liên hệ được (Hồng)</option>
                             <option value="Khách đang mua">Khách đang mua (Xanh lá)</option>
-                            <option value="Khách lỏ">Khách lỏ (Đỏ)</option>
-                            <option value="Khách VIP">Khách VIP (Vàng)</option>
+                            <option value="Chưa phản hồi">Chưa phản hồi (Đỏ)</option>
+                            <option value="Không phản hồi">Không phản hồi (Vàng)</option>
                         </select>
                     </div>
 
@@ -410,10 +410,10 @@
                                         <select id="filterClassification" style="padding: 2px 4px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 12px; font-weight: normal; background: #fff; cursor: pointer; color: var(--text-main); width: auto; max-width: 130px;">
                                             <option value="">Tất cả</option>
                                             <option value="Khách mới">Khách mới</option>
-                                            <option value="Khách tiềm năng">Khách tiềm năng</option>
+                                            <option value="Chưa liên hệ được">Chưa liên hệ được</option>
                                             <option value="Khách đang mua">Khách đang mua</option>
-                                            <option value="Khách lỏ">Khách lỏ</option>
-                                            <option value="Khách VIP">Khách VIP</option>
+                                            <option value="Chưa phản hồi">Chưa phản hồi</option>
+                                            <option value="Không phản hồi">Không phản hồi</option>
                                         </select>
                                     </div>
                                 </th>
@@ -596,10 +596,10 @@
 
         const classificationColors = {
             "Khách mới": "#3b82f6",      // Xanh dương
-            "Khách tiềm năng": "#ec4899", // Hồng
+            "Chưa liên hệ được": "#ec4899", // Hồng
             "Khách đang mua": "#10b981",  // Xanh lá
-            "Khách lỏ": "#ef4444",       // Đỏ
-            "Khách VIP": "#eab308"       // Vàng
+            "Chưa phản hồi": "#ef4444",       // Đỏ
+            "Không phản hồi": "#eab308"       // Vàng
         };
 
         function getFormData() {
