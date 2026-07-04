@@ -289,47 +289,45 @@
         let currentPage = 1;
         const itemsPerPage = 10;
 
-       function mapFromSupabase(row) {
-    let parsedHistory = [];
-
-    if (typeof row.history === 'string') {
-        try {
-            parsedHistory = JSON.parse(row.history);
-        } catch {
-            parsedHistory = [];
+        function mapFromSupabase(row) {
+            let parsedHistory = [];
+            if (typeof row.history === 'string') {
+                try {
+                    parsedHistory = JSON.parse(row.history);
+                } catch {
+                    parsedHistory = [];
+                }
+            } else if (Array.isArray(row.history)) {
+                parsedHistory = row.history;
+            }
+            return {
+                customerId: row.customer_id || '',
+                taxId: row.tax_id || '',
+                companyName: row.company_name || '',
+                classification: row.classification || '',
+                contactName: row.contact_name || '',
+                phone: row.phone || '',
+                sales: Number(row.sales) || 0,
+                notes: row.notes || '',
+                lastUpdated: row.updated_at || '',
+                history: parsedHistory
+            };
         }
-    } else if (Array.isArray(row.history)) {
-        parsedHistory = row.history;
-    }
-
-    return {
-        customerId: row.customer_id || '',
-        taxId: row.tax_id || '',
-        companyName: row.company_name || '',
-        classification: row.classification || '',
-        contactName: row.contact_name || '',
-        phone: row.phone || '',
-        sales: Number(row.sales) || 0,
-        notes: row.notes || '',
-        lastUpdated: row.updated_at || '',
-        history: parsedHistory
-    };
-}
 
         function mapToSupabase(c) {
-    return {
-        customer_id: c.customerId?.trim() || '',
-        tax_id: c.taxId?.trim() || '',
-        company_name: c.companyName?.trim() || '',
-        classification: c.classification || '',
-        contact_name: c.contactName?.trim() || '',
-        phone: c.phone?.trim() || '',
-        sales: Number(c.sales) || 0,
-        notes: c.notes?.trim() || '',
-        updated_at: c.lastUpdated || new Date().toISOString(),
-        history: Array.isArray(c.history) ? c.history : []
-    };
-}
+            return {
+                customer_id: c.customerId?.trim() || '',
+                tax_id: c.taxId?.trim() || '',
+                company_name: c.companyName?.trim() || '',
+                classification: c.classification || '',
+                contact_name: c.contactName?.trim() || '',
+                phone: c.phone?.trim() || '',
+                sales: Number(c.sales) || 0,
+                notes: c.notes?.trim() || '',
+                updated_at: c.lastUpdated || new Date().toISOString(),
+                history: Array.isArray(c.history) ? c.history : []
+            };
+        }
 
         async function fetchCustomers() {
             const tableBody = document.getElementById('tableBody');
