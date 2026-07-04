@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Doanh số Khách hàng</title>
-    <!-- Thêm thư viện xuất Excel (SheetJS) và thư viện xuất PDF (pdfmake) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <style>
-        /* CSS Cơ bản */
+        /* CSS Cơ bản giữ nguyên như cũ... */
         :root {
             --primary-color: #2563eb;
             --primary-hover: #1d4ed8;
@@ -19,276 +18,61 @@
             --text-muted: #64748b;
             --border-color: #e2e8f0;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding: 20px;
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 1600px;
-            width: 98%;
-            margin: 0 auto;
-        }
-
-        .header {
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .header h1 {
-            color: var(--primary-color);
-        }
-
-        /* Layout Grid */
-        .main-content {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .form-section {
-            flex: 1;
-            min-width: 300px;
-            max-width: 360px;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border: 1px solid var(--border-color);
-        }
-
-        .table-section {
-            flex: 1;
-            min-width: 600px;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border: 1px solid var(--border-color);
-        }
-
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 14px;
-            line-height: 1.5;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .form-row .form-group {
-            flex: 1;
-        }
-
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            text-align: center;
-            display: inline-block;
-            width: 100%;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; line-height: 1.5; }
+        .container { max-width: 1600px; width: 98%; margin: 0 auto; }
+        .header { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .header h1 { color: var(--primary-color); }
+        .main-content { display: flex; gap: 20px; flex-wrap: wrap; }
+        .form-section { flex: 1; min-width: 300px; max-width: 360px; background: var(--card-bg); padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
+        .table-section { flex: 1; min-width: 600px; background: var(--card-bg); padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+        .form-control { width: 100%; padding: 12px 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; line-height: 1.5; transition: all 0.2s ease-in-out; }
+        .form-control:focus { outline: none; border-color: var(--primary-color); }
+        .form-row { display: flex; gap: 10px; }
+        .form-row .form-group { flex: 1; }
+        .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-align: center; display: inline-block; width: 100%; }
         .btn-primary { background-color: var(--primary-color); color: white; }
         .btn-primary:hover { background-color: var(--primary-hover); }
         .btn-secondary { background-color: #f1f5f9; color: var(--text-main); border: 1px solid var(--border-color); }
         .btn-secondary:hover { background-color: #e2e8f0; }
         .btn-danger { background-color: #ef4444; color: white; }
         .btn-danger:hover { background-color: #dc2626; }
-
-        /* Styles cho nút xuất file */
         .btn-export-excel { background-color: #10b981; color: white; }
         .btn-export-excel:hover { background-color: #059669; }
         .btn-import-excel { background-color: #3b82f6; color: white; }
         .btn-import-excel:hover { background-color: #2563eb; }
         .btn-export-pdf { background-color: #f59e0b; color: white; }
         .btn-export-pdf:hover { background-color: #d97706; }
-        
         .btn-report-month { background-color: #ec4899; color: white; }
         .btn-report-month:hover { background-color: #db2777; }
-
-        .btn-sm {
-            padding: 6px 10px;
-            font-size: 12px;
-            width: auto;
-        }
-
-        .edit-actions {
-            display: none;
-            gap: 10px;
-        }
-
-        /* Table Styles */
-        .table-header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .search-box {
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            width: 250px;
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            min-width: 1100px;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
-            vertical-align: middle;
-        }
-
+        .btn-sm { padding: 6px 10px; font-size: 12px; width: auto; }
+        .edit-actions { display: none; gap: 10px; }
+        .table-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .search-box { padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; width: 250px; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; min-width: 1200px; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; vertical-align: middle; }
         .nowrap { white-space: nowrap; }
-        .col-company { min-width: 250px; }
+        .col-company { min-width: 200px; }
         .col-notes { min-width: 150px; }
-
-        th {
-            background-color: #f8fafc;
-            color: var(--text-muted);
-        }
-
-        tbody tr:hover {
-            background-color: #f1f5f9;
-            cursor: pointer;
-        }
-
+        th { background-color: #f8fafc; color: var(--text-muted); }
+        tbody tr:hover { background-color: #f1f5f9; cursor: pointer; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
-
-        .money {
-            color: #10b981;
-            font-weight: bold;
-        }
-
-        /* Pagination Styles */
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-            gap: 5px;
-        }
-
-        .page-btn {
-            padding: 6px 12px;
-            border: 1px solid var(--border-color);
-            background: white;
-            color: var(--text-main);
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .page-btn:hover:not(.active):not(:disabled) {
-            background: #f1f5f9;
-        }
-
-        .page-btn.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .page-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 400px;
-            max-width: 90%;
-        }
-
-        .modal-actions {
-            margin-top: 20px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .modal-actions .btn {
-            width: auto;
-        }
-        
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-            .table-section {
-                min-width: 100%;
-            }
-        }
+        .money { color: #10b981; font-weight: bold; }
+        .pagination-container { display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 5px; }
+        .page-btn { padding: 6px 12px; border: 1px solid var(--border-color); background: white; color: var(--text-main); border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .page-btn:hover:not(.active):not(:disabled) { background: #f1f5f9; }
+        .page-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .page-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; width: 400px; max-width: 90%; }
+        .modal-actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+        .modal-actions .btn { width: auto; }
+        @media (max-width: 768px) { .table-section { min-width: 100%; } }
     </style>
 </head>
 <body>
@@ -298,7 +82,6 @@
         </header>
 
         <div class="main-content">
-            <!-- Cột nhập liệu -->
             <section class="form-section">
                 <h2 id="formTitle">Thông tin Khách hàng</h2>
                 <br>
@@ -357,18 +140,16 @@
                         <textarea id="notes" class="form-control" rows="3" placeholder="Thêm ghi chú..."></textarea>
                     </div>
 
-                    <!-- Nút bấm -->
                     <button type="submit" id="btnSubmit" class="btn btn-primary">Lưu Thông Tin</button>
                     
                     <div id="editActions" class="edit-actions">
                         <button type="button" id="btnUpdate" class="btn btn-primary">Cập nhật</button>
                         <button type="button" id="btnDelete" class="btn btn-danger" title="Xóa khách hàng này">Xóa</button>
-                        <button type="button" id="btnCancelEdit" class="btn btn-secondary">Hủy thay đổi</button>
+                        <button type="button" id="btnCancelEdit" class="btn btn-secondary">Hủy</button>
                     </div>
                 </form>
             </section>
 
-            <!-- Cột danh sách bảng -->
             <section class="table-section">
                 <div class="table-header-flex">
                     <h2>Bảng Xếp hạng Doanh số</h2>
@@ -380,7 +161,6 @@
                         <button type="button" id="btnExportExcel" class="btn btn-export-excel btn-sm">Xuất Excel</button>
                         <button type="button" id="btnExportPDF" class="btn btn-export-pdf btn-sm">Xuất PDF</button>
                         
-                        <!-- Nút Báo Cáo Doanh Thu Mới -->
                         <span style="border-left: 1px solid #cbd5e1; height: 24px; margin: 0 4px;"></span>
                         <button type="button" id="btnReportMonth" class="btn btn-report-month btn-sm">Báo cáo Tháng</button>
                     </div>
@@ -409,6 +189,7 @@
                                 <th class="nowrap">Người liên hệ</th>
                                 <th class="nowrap">SĐT</th>
                                 <th class="text-right nowrap">Doanh số KH</th>
+                                <th class="nowrap">Ngày cập nhật</th>
                                 <th class="col-notes">Ghi chú</th>
                             </tr>
                         </thead>
@@ -423,13 +204,11 @@
         </div>
     </div>
 
-    <!-- Modals -->
     <div id="reportModal" class="modal-overlay">
         <div class="modal-content" style="width: 800px; max-width: 95%;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="color: var(--primary-color); margin: 0;">Báo Cáo Doanh Thu</h3>
-                <select id="reportMonthSelect" style="padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 14px; cursor: pointer; font-weight: bold; color: var(--text-main);">
-                </select>
+                <select id="reportMonthSelect" style="padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 14px; cursor: pointer; font-weight: bold; color: var(--text-main);"></select>
             </div>
             <div style="max-height: 400px; overflow-y: auto; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 4px;">
                 <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
@@ -442,8 +221,7 @@
                             <th style="background: #f8fafc; padding: 10px; border-bottom: 1px solid #e2e8f0;">Ghi chú</th>
                         </tr>
                     </thead>
-                    <tbody id="reportTableBody">
-                    </tbody>
+                    <tbody id="reportTableBody"></tbody>
                 </table>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
@@ -473,7 +251,7 @@
             <p id="deleteModalMessage">Bạn có chắc chắn muốn xóa khách hàng này không? Dữ liệu không thể khôi phục.</p>
             <div class="modal-actions">
                 <button type="button" id="btnCancelDelete" class="btn btn-secondary">Hủy</button>
-                <button type="button" id="btnConfirmDelete" class="btn btn-danger">Xóa Khách Hàng</button>
+                <button type="button" id="btnConfirmDelete" class="btn btn-danger">Xóa</button>
             </div>
         </div>
     </div>
@@ -503,7 +281,7 @@
         let customers = [];
         try {
             customers = JSON.parse(localStorage.getItem('customers_data')) || [];
-            // Migration: Khởi tạo history cho dữ liệu cũ chưa có (tránh lỗi null khi tính doanh thu theo kỳ)
+            // Migration: Khởi tạo history và lastUpdated cho dữ liệu cũ
             customers = customers.map(c => {
                 if (!c.history) {
                     c.history = [{
@@ -511,6 +289,12 @@
                         amount: c.sales || 0,
                         note: 'Khởi tạo dữ liệu gốc'
                     }];
+                }
+                // HÀM MỚI: Nếu chưa có ngày cập nhật, lấy ngày của history mới nhất, hoặc ngày hiện tại
+                if (!c.lastUpdated) {
+                    c.lastUpdated = (c.history && c.history.length > 0) 
+                        ? c.history[c.history.length - 1].date 
+                        : new Date().toISOString();
                 }
                 return c;
             });
@@ -535,7 +319,7 @@
         let currentPage = 1;
         const itemsPerPage = 10;
 
-        // Khởi tạo các DOM elements
+        // Khởi tạo DOM
         const form = document.getElementById('customerForm');
         const searchInput = document.getElementById('searchInput');
         const tableBody = document.getElementById('tableBody');
@@ -546,18 +330,11 @@
         const modalMessage = document.getElementById('modalMessage');
         const deleteModal = document.getElementById('deleteModal');
         const deleteModalMessage = document.getElementById('deleteModalMessage');
-        const btnCancelDelete = document.getElementById('btnCancelDelete');
-        const btnConfirmDelete = document.getElementById('btnConfirmDelete');
-        
         const warningModal = document.getElementById('warningModal');
         const warningModalMessage = document.getElementById('warningModalMessage');
-        const btnCancelWarning = document.getElementById('btnCancelWarning');
-        const btnConfirmWarning = document.getElementById('btnConfirmWarning');
-        
         const notificationModal = document.getElementById('notificationModal');
         const notificationTitle = document.getElementById('notificationTitle');
         const notificationMessage = document.getElementById('notificationMessage');
-        const btnCloseNotification = document.getElementById('btnCloseNotification');
 
         const idInput = document.getElementById('customerId');
         const taxIdInput = document.getElementById('taxId');
@@ -570,25 +347,18 @@
         const salesInput = document.getElementById('sales');
         const addSalesContainer = document.getElementById('addSalesContainer');
         const addSalesInput = document.getElementById('addSales');
-        
         const notesInput = document.getElementById('notes');
+
         const btnSubmit = document.getElementById('btnSubmit');
         const editActions = document.getElementById('editActions');
         const btnCancelEdit = document.getElementById('btnCancelEdit');
         const btnUpdate = document.getElementById('btnUpdate');
         const btnDelete = document.getElementById('btnDelete');
         
-        const formTitle = document.getElementById('formTitle');
         const fileInputExcel = document.getElementById('fileInputExcel');
-        const btnImportExcel = document.getElementById('btnImportExcel');
-        const btnExportExcel = document.getElementById('btnExportExcel');
-        const btnExportPDF = document.getElementById('btnExportPDF');
-        
-        const btnReportMonth = document.getElementById('btnReportMonth');
-
         let customerToDelete = null;
 
-        // Định dạng dấu phẩy tự động và đổi màu khi nhập số
+        // Định dạng dấu phẩy tự động
         function formatInputWithCommas(e) {
             let isNegative = this.value.startsWith('-');
             let rawValue = this.value.replace(/\D/g, ''); 
@@ -621,6 +391,16 @@
 
         function formatCurrency(amount) {
             return Number(amount).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        }
+
+        // HÀM MỚI: Format ngày tháng hiển thị
+        function formatDateTime(isoString) {
+            if (!isoString) return '-';
+            const d = new Date(isoString);
+            return d.toLocaleString('vi-VN', { 
+                day: '2-digit', month: '2-digit', year: 'numeric', 
+                hour: '2-digit', minute: '2-digit' 
+            });
         }
 
         const classificationColors = {
@@ -666,7 +446,7 @@
         function toggleEditMode(editing) {
             isEditing = editing;
             if (editing) {
-                formTitle.innerText = "Chỉnh sửa Khách hàng";
+                document.getElementById('formTitle').innerText = "Chỉnh sửa Khách hàng";
                 btnSubmit.style.display = 'none';
                 editActions.style.display = 'flex';
                 idInput.readOnly = true;
@@ -677,11 +457,8 @@
                 
                 addSalesContainer.style.display = 'block';
                 salesLabel.innerText = "Doanh số gốc (VNĐ)";
-                addSalesInput.value = '';
-                addSalesInput.style.borderColor = 'var(--border-color)';
-                addSalesInput.style.color = 'var(--text-main)';
             } else {
-                formTitle.innerText = "Thông tin Khách hàng";
+                document.getElementById('formTitle').innerText = "Thông tin Khách hàng";
                 btnSubmit.style.display = 'block';
                 editActions.style.display = 'none';
                 idInput.readOnly = false;
@@ -694,7 +471,6 @@
                 
                 addSalesContainer.style.display = 'none';
                 salesLabel.innerText = "Doanh số KH (VNĐ)";
-                addSalesInput.value = '';
             }
         }
 
@@ -703,11 +479,11 @@
             const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
             if (totalPages <= 1) return;
             const prevBtn = document.createElement('button');
-            prevBtn.className = 'page-btn';
-            prevBtn.innerText = 'Trước';
+            prevBtn.className = 'page-btn'; prevBtn.innerText = 'Trước';
             prevBtn.disabled = currentPage === 1;
             prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; renderTable(); } };
             paginationContainer.appendChild(prevBtn);
+            
             for (let i = 1; i <= totalPages; i++) {
                 const pageBtn = document.createElement('button');
                 pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
@@ -715,9 +491,9 @@
                 pageBtn.onclick = () => { currentPage = i; renderTable(); };
                 paginationContainer.appendChild(pageBtn);
             }
+            
             const nextBtn = document.createElement('button');
-            nextBtn.className = 'page-btn';
-            nextBtn.innerText = 'Sau';
+            nextBtn.className = 'page-btn'; nextBtn.innerText = 'Sau';
             nextBtn.disabled = currentPage === totalPages;
             nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; renderTable(); } };
             paginationContainer.appendChild(nextBtn);
@@ -736,7 +512,6 @@
                     (c.classification && String(c.classification).toLowerCase().includes(query));
                 
                 const matchClass = filterClassVal === '' || c.classification === filterClassVal;
-                
                 return matchSearch && matchClass;
             });
             
@@ -748,7 +523,7 @@
             
             tableBody.innerHTML = '';
             if (paginatedItems.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #94a3b8; padding: 30px;">Không có dữ liệu.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #94a3b8; padding: 30px;">Không có dữ liệu.</td></tr>`;
                 paginationContainer.innerHTML = '';
                 return;
             }
@@ -768,6 +543,7 @@
                     <td class="nowrap">${customer.contactName || '-'}</td>
                     <td class="nowrap">${customer.phone || '-'}</td>
                     <td class="text-right money nowrap" style="color: ${salesColor};">${formatCurrency(customer.sales)}</td>
+                    <td class="nowrap" style="font-size: 13px; color: var(--text-muted);">${formatDateTime(customer.lastUpdated)}</td>
                     <td>${customer.notes || '-'}</td>
                 `;
                 tableBody.appendChild(tr);
@@ -788,12 +564,13 @@
         }
 
         function proceedWithSave(data, isUpdating) {
+            // HÀM MỚI: Luôn gán thời gian hiện tại khi Lưu / Cập nhật thành công
+            data.lastUpdated = new Date().toISOString(); 
+
             if (isUpdating) {
                 const index = customers.findIndex(c => String(c.customerId || '').toLowerCase() === String(data.customerId || '').toLowerCase());
                 if (index !== -1) { 
-                    // Giữ nguyên history cũ
                     data.history = customers[index].history || [];
-                    // Log lịch sử được xử lý ở btnUpdate
                     customers[index] = data; 
                     saveData(); 
                     toggleEditMode(false); 
@@ -806,9 +583,8 @@
                     modalMessage.innerHTML = `Mã khách hàng <strong>"${data.customerId}"</strong> đã tồn tại. Bạn có muốn cập nhật thông tin và doanh số không?`;
                     modal.style.display = 'flex';
                 } else {
-                    // Tạo mới: khởi tạo history
                     data.history = [{
-                        date: new Date().toISOString(),
+                        date: data.lastUpdated,
                         amount: data.sales,
                         note: 'Tạo mới'
                     }];
@@ -851,7 +627,6 @@
             const data = getFormData();
             const addedSalesStr = addSalesInput.value.replace(/[,.]/g, '');
             
-            // Xử lý lưu lịch sử
             const existingCustIndex = customers.findIndex(c => String(c.customerId).toLowerCase() === String(data.customerId).toLowerCase());
             if(existingCustIndex !== -1) {
                 data.history = customers[existingCustIndex].history || [];
@@ -864,7 +639,6 @@
                 if (addedSales > 0 || addedSales < 0) {
                     data.sales += addedSales; 
                     
-                    // Thêm vào history
                     data.history.push({
                         date: new Date().toISOString(),
                         amount: addedSales,
@@ -885,23 +659,24 @@
             handleSaveAction(data, true); 
         });
 
-        btnCloseNotification.addEventListener('click', function() { notificationModal.style.display = 'none'; });
-        btnConfirmWarning.addEventListener('click', function() { if (pendingActionData) proceedWithSave(pendingActionData.data, pendingActionData.isUpdating); warningModal.style.display = 'none'; pendingActionData = null; });
-        btnCancelWarning.addEventListener('click', function() { warningModal.style.display = 'none'; pendingActionData = null; });
-        btnDelete.addEventListener('click', function() { const id = idInput.value.trim(); customerToDelete = id; deleteModalMessage.innerHTML = `Bạn có chắc chắn muốn xóa khách hàng <strong>"${id}"</strong> không?`; deleteModal.style.display = 'flex'; });
-        btnConfirmDelete.addEventListener('click', function() { if (customerToDelete) { customers = customers.filter(c => String(c.customerId).toLowerCase() !== String(customerToDelete).toLowerCase()); saveData(); toggleEditMode(false); renderTable(); } deleteModal.style.display = 'none'; });
-        btnCancelDelete.addEventListener('click', function() { deleteModal.style.display = 'none'; });
-        btnCancelEdit.addEventListener('click', function() { toggleEditMode(false); });
+        // Event Listeners cho Modals & Buttons
+        document.getElementById('btnCloseNotification').addEventListener('click', function() { notificationModal.style.display = 'none'; });
+        document.getElementById('btnConfirmWarning').addEventListener('click', function() { if (pendingActionData) proceedWithSave(pendingActionData.data, pendingActionData.isUpdating); warningModal.style.display = 'none'; pendingActionData = null; });
+        document.getElementById('btnCancelWarning').addEventListener('click', function() { warningModal.style.display = 'none'; pendingActionData = null; });
+        document.getElementById('btnDelete').addEventListener('click', function() { const id = idInput.value.trim(); customerToDelete = id; deleteModalMessage.innerHTML = `Bạn có chắc chắn muốn xóa khách hàng <strong>"${id}"</strong> không?`; deleteModal.style.display = 'flex'; });
+        document.getElementById('btnConfirmDelete').addEventListener('click', function() { if (customerToDelete) { customers = customers.filter(c => String(c.customerId).toLowerCase() !== String(customerToDelete).toLowerCase()); saveData(); toggleEditMode(false); renderTable(); } deleteModal.style.display = 'none'; });
+        document.getElementById('btnCancelDelete').addEventListener('click', function() { deleteModal.style.display = 'none'; });
+        document.getElementById('btnCancelEdit').addEventListener('click', function() { toggleEditMode(false); });
         
         searchInput.addEventListener('input', () => { currentPage = 1; renderTable(); });
-        if (filterClassification) {
-            filterClassification.addEventListener('change', () => { currentPage = 1; renderTable(); });
-        }
+        if (filterClassification) filterClassification.addEventListener('change', () => { currentPage = 1; renderTable(); });
 
         document.getElementById('btnConfirmModal').addEventListener('click', function() {
             const index = customers.findIndex(c => String(c.customerId).toLowerCase() === String(pendingCustomerData.customerId).toLowerCase());
             if (index !== -1) { 
                 pendingCustomerData.history = customers[index].history || [];
+                // Cập nhật lại thời gian khi confirm update trùng mã
+                pendingCustomerData.lastUpdated = new Date().toISOString();
                 customers[index] = pendingCustomerData; 
                 saveData(); 
             }
@@ -912,7 +687,6 @@
         function getFilteredAndSortedData() {
             const query = searchInput.value.toLowerCase();
             const filterClassVal = filterClassification ? filterClassification.value : '';
-
             let filtered = customers.filter(c => {
                 const matchSearch = String(c.customerId || '').toLowerCase().includes(query) ||
                     (c.companyName && String(c.companyName).toLowerCase().includes(query)) ||
@@ -927,7 +701,8 @@
             return filtered;
         }
 
-        btnExportExcel.addEventListener('click', function() {
+        // --- XUẤT EXCEL / PDF BỔ SUNG CỘT NGÀY CẬP NHẬT ---
+        document.getElementById('btnExportExcel').addEventListener('click', function() {
             const data = getFilteredAndSortedData();
             if (data.length === 0) return;
             const exportData = data.map((c, index) => ({
@@ -939,6 +714,7 @@
                 "Người liên hệ": c.contactName || "",
                 "Số điện thoại": c.phone || "",
                 "Doanh số KH (VNĐ)": c.sales || 0,
+                "Ngày cập nhật": formatDateTime(c.lastUpdated), // CỘT MỚI
                 "Ghi chú": c.notes || ""
             }));
 
@@ -948,7 +724,7 @@
             XLSX.writeFile(wb, "Bang_Xep_Hang_Doanh_So.xlsx");
         });
 
-        btnExportPDF.addEventListener('click', function() {
+        document.getElementById('btnExportPDF').addEventListener('click', function() {
             const data = getFilteredAndSortedData();
             if (data.length === 0) return;
             const tableBody = [];
@@ -960,6 +736,7 @@
                 { text: 'Người LH', style: 'tableHeader' },
                 { text: 'SĐT', style: 'tableHeader' },
                 { text: 'Doanh số (VNĐ)', style: 'tableHeader', alignment: 'right' },
+                { text: 'Ngày cập nhật', style: 'tableHeader' }, // CỘT MỚI
                 { text: 'Ghi chú', style: 'tableHeader' }
             ]);
             data.forEach((c, index) => {
@@ -973,6 +750,7 @@
                     { text: c.contactName || '-' },
                     { text: c.phone || '-' },
                     { text: formatCurrency(c.sales || 0), alignment: 'right', color: salesColor, bold: true },
+                    { text: formatDateTime(c.lastUpdated), fontSize: 9 }, // DỮ LIỆU MỚI
                     { text: c.notes || '-' }
                 ]);
             });
@@ -985,7 +763,8 @@
                     {
                         table: {
                             headerRows: 1,
-                            widths: ['5%', '13%', '10%', '24%', '12%', '11%', '15%', '10%'],
+                            // Thêm tỉ lệ cột cho Ngày cập nhật
+                            widths: ['4%', '11%', '9%', '21%', '11%', '10%', '13%', '12%', '9%'], 
                             body: tableBody
                         },
                         layout: {
@@ -1009,15 +788,9 @@
             pdfMake.createPdf(docDefinition).download('Bang_Xep_Hang_Doanh_So.pdf');
         });
 
-        // ------------------ LOGIC BÁO CÁO THEO THÁNG ------------------
-        const reportModal = document.getElementById('reportModal');
-        const reportTableBody = document.getElementById('reportTableBody');
-        const reportTotalRevenue = document.getElementById('reportTotalRevenue');
-        const btnCloseReport = document.getElementById('btnCloseReport');
+        // BÁO CÁO THÁNG (Giữ nguyên logic cũ)
         const reportMonthSelect = document.getElementById('reportMonthSelect');
-
-        btnCloseReport.addEventListener('click', () => { reportModal.style.display = 'none'; });
-
+        document.getElementById('btnCloseReport').addEventListener('click', () => { document.getElementById('reportModal').style.display = 'none'; });
         function populateMonthSelect() {
             reportMonthSelect.innerHTML = '';
             const now = new Date();
@@ -1031,78 +804,43 @@
                 reportMonthSelect.appendChild(option);
             }
         }
-
-        function getDatesForReport(year, monthIndex) {
-            let start = new Date(year, monthIndex, 1);
-            start.setHours(0,0,0,0);
-            let end = new Date(year, monthIndex + 1, 0);
-            end.setHours(23, 59, 59, 999);
-            
-            return { start, end };
-        }
-
         function showRevenueReport() {
             const selectedValue = reportMonthSelect.value;
             let year, monthIndex, monthLabel;
-            
             if (selectedValue) {
                 const parts = selectedValue.split('-');
-                year = parseInt(parts[0], 10);
-                monthIndex = parseInt(parts[1], 10) - 1;
-                monthLabel = `${monthIndex + 1}/${year}`;
+                year = parseInt(parts[0], 10); monthIndex = parseInt(parts[1], 10) - 1; monthLabel = `${monthIndex + 1}/${year}`;
             } else {
-                const now = new Date();
-                year = now.getFullYear();
-                monthIndex = now.getMonth();
-                monthLabel = `${monthIndex + 1}/${year}`;
+                const now = new Date(); year = now.getFullYear(); monthIndex = now.getMonth(); monthLabel = `${monthIndex + 1}/${year}`;
             }
-
-            const { start, end } = getDatesForReport(year, monthIndex);
+            let start = new Date(year, monthIndex, 1); start.setHours(0,0,0,0);
+            let end = new Date(year, monthIndex + 1, 0); end.setHours(23, 59, 59, 999);
             let totalRevenuePeriod = 0;
-
             let transactionsInPeriod = [];
 
-            // Thu thập toàn bộ lịch sử giao dịch nằm trong khoảng thời gian báo cáo
             customers.forEach(c => {
                 if (c.history && c.history.length > 0) {
                     c.history.forEach(tx => {
                         const txDate = new Date(tx.date);
-                        // Chỉ lấy những giao dịch có biến động doanh số
                         if (txDate >= start && txDate <= end && tx.amount !== 0) {
-                            transactionsInPeriod.push({
-                                customer: c,
-                                tx: tx,
-                                date: txDate
-                            });
+                            transactionsInPeriod.push({ customer: c, tx: tx, date: txDate });
                         }
                     });
                 }
             });
-
-            // Sắp xếp giao dịch theo thời gian mới nhất lên đầu
             transactionsInPeriod.sort((a, b) => b.date - a.date);
-
-            // Đổ dữ liệu ra Modal HTML
+            const reportTableBody = document.getElementById('reportTableBody');
             reportTableBody.innerHTML = '';
-            
             if (transactionsInPeriod.length === 0) {
                 reportTableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 30px; color: #64748b;">Không có giao dịch/biến động doanh thu nào phát sinh trong <strong>Tháng ${monthLabel}</strong>.</td></tr>`;
-                reportTotalRevenue.innerText = "0 đ";
-                reportTotalRevenue.style.color = "#64748b";
+                document.getElementById('reportTotalRevenue').innerText = "0 đ";
+                document.getElementById('reportTotalRevenue').style.color = "#64748b";
             } else {
                 transactionsInPeriod.forEach(item => {
-                    const c = item.customer;
-                    const tx = item.tx;
-                    
-                    // Định dạng thời gian hiển thị (VD: 26/06/2026 14:30)
-                    const formattedTime = item.date.toLocaleString('vi-VN', { 
-                        day: '2-digit', month: '2-digit', year: 'numeric', 
-                        hour: '2-digit', minute: '2-digit'
-                    });
-
+                    const c = item.customer; const tx = item.tx;
+                    const formattedTime = item.date.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                     totalRevenuePeriod += tx.amount;
                     let amountColor = tx.amount > 0 ? '#10b981' : '#ef4444';
-
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px; text-align: center;">${formattedTime}</td>
@@ -1113,23 +851,16 @@
                     `;
                     reportTableBody.appendChild(tr);
                 });
-                reportTotalRevenue.innerText = formatCurrency(totalRevenuePeriod);
-                reportTotalRevenue.style.color = totalRevenuePeriod >= 0 ? "#10b981" : "#ef4444";
+                document.getElementById('reportTotalRevenue').innerText = formatCurrency(totalRevenuePeriod);
+                document.getElementById('reportTotalRevenue').style.color = totalRevenuePeriod >= 0 ? "#10b981" : "#ef4444";
             }
-
-            // Hiện popup
-            reportModal.style.display = 'flex';
+            document.getElementById('reportModal').style.display = 'flex';
         }
-
         reportMonthSelect.addEventListener('change', showRevenueReport);
+        document.getElementById('btnReportMonth').addEventListener('click', () => { populateMonthSelect(); showRevenueReport(); });
 
-        btnReportMonth.addEventListener('click', () => {
-            populateMonthSelect();
-            showRevenueReport();
-        });
-        // ---------------------------------------------------------------------
-
-        btnImportExcel.addEventListener('click', function() {
+        // IMPORT EXCEL
+        document.getElementById('btnImportExcel').addEventListener('click', function() {
             fileInputExcel.value = null; 
             fileInputExcel.click();
         });
@@ -1137,7 +868,6 @@
         fileInputExcel.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(event) {
                 try {
@@ -1146,25 +876,17 @@
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" }); 
-
-                    let importedCount = 0;
-                    let updatedCount = 0;
+                    let importedCount = 0; let updatedCount = 0;
 
                     jsonData.forEach(row => {
                         const normRow = {};
                         for (let k in row) {
-                            if (row.hasOwnProperty(k)) {
-                                normRow[k.trim().toLowerCase()] = row[k];
-                            }
+                            if (row.hasOwnProperty(k)) { normRow[k.trim().toLowerCase()] = row[k]; }
                         }
-
                         const custId = String(normRow["mã kh"] || normRow["mã khách hàng"] || normRow["customerid"] || normRow["mã"] || "").trim();
                         if (!custId) return;
-
                         let salesVal = normRow["doanh số kh (vnđ)"] || normRow["doanh số (vnđ)"] || normRow["doanh số"] || normRow["sales"] || 0;
-                        if (typeof salesVal === 'string') {
-                            salesVal = Number(salesVal.replace(/[,.]/g, '')) || 0;
-                        }
+                        if (typeof salesVal === 'string') { salesVal = Number(salesVal.replace(/[,.]/g, '')) || 0; }
 
                         const newCustomer = {
                             customerId: custId,
@@ -1174,60 +896,45 @@
                             contactName: String(normRow["người liên hệ"] || normRow["người lh"] || normRow["contactname"] || "").trim(),
                             phone: String(normRow["số điện thoại"] || normRow["sđt"] || normRow["phone"] || "").trim(),
                             sales: Number(salesVal) || 0,
-                            notes: String(normRow["ghi chú"] || normRow["notes"] || "").trim()
+                            notes: String(normRow["ghi chú"] || normRow["notes"] || "").trim(),
+                            lastUpdated: new Date().toISOString() // CẬP NHẬT THỜI GIAN KHI IMPORT
                         };
 
                         const existingIndex = customers.findIndex(c => String(c.customerId).toLowerCase() === custId.toLowerCase());
                         if (existingIndex !== -1) {
-                            // Ghi lại lịch sử nếu doanh thu có thay đổi từ excel
                             const diff = newCustomer.sales - (customers[existingIndex].sales || 0);
                             newCustomer.history = customers[existingIndex].history || [];
                             if (diff !== 0) {
-                                newCustomer.history.push({
-                                    date: new Date().toISOString(),
-                                    amount: diff,
-                                    note: 'Cập nhật qua Excel'
-                                });
+                                newCustomer.history.push({ date: new Date().toISOString(), amount: diff, note: 'Cập nhật qua Excel' });
                             }
                             customers[existingIndex] = newCustomer;
                             updatedCount++;
                         } else {
-                            newCustomer.history = [{
-                                date: new Date().toISOString(),
-                                amount: newCustomer.sales,
-                                note: 'Thêm mới qua Excel'
-                            }];
+                            newCustomer.history = [{ date: new Date().toISOString(), amount: newCustomer.sales, note: 'Thêm mới qua Excel' }];
                             customers.push(newCustomer);
                             importedCount++;
                         }
                     });
 
                     if (importedCount === 0 && updatedCount === 0) {
-                        notificationTitle.innerText = "Lỗi Cấu Trúc File";
-                        notificationTitle.style.color = "#ef4444";
+                        notificationTitle.innerText = "Lỗi Cấu Trúc File"; notificationTitle.style.color = "#ef4444";
                         notificationMessage.innerHTML = "Không thể đọc dữ liệu! Hãy đảm bảo file Excel của bạn có chứa cột tiêu đề <strong>Mã KH</strong>.";
                         notificationModal.style.display = 'flex';
                     } else {
-                        saveData();
-                        currentPage = 1;
-                        renderTable();
-                        notificationTitle.innerText = "Nhập Excel Thành Công!";
-                        notificationTitle.style.color = "#10b981";
+                        saveData(); currentPage = 1; renderTable();
+                        notificationTitle.innerText = "Nhập Excel Thành Công!"; notificationTitle.style.color = "#10b981";
                         notificationMessage.innerHTML = `Đã thêm mới: <strong>${importedCount}</strong> khách hàng.<br>Đã cập nhật: <strong>${updatedCount}</strong> khách hàng (do trùng mã).`;
                         notificationModal.style.display = 'flex';
                     }
                 } catch (error) {
-                    console.error("Lỗi đọc file Excel:", error);
-                    notificationTitle.innerText = "Lỗi Nhập File";
-                    notificationTitle.style.color = "#ef4444";
-                    notificationMessage.innerHTML = "Không thể đọc file Excel. Vui lòng kiểm tra lại file của bạn (nên dùng định dạng .xlsx hoặc .csv)!";
+                    notificationTitle.innerText = "Lỗi Nhập File"; notificationTitle.style.color = "#ef4444";
+                    notificationMessage.innerHTML = "Không thể đọc file Excel. Vui lòng kiểm tra lại định dạng!";
                     notificationModal.style.display = 'flex';
                 }
             };
             reader.readAsArrayBuffer(file);
         });
 
-        // Khởi động
         renderTable();
     </script>
 </body>
