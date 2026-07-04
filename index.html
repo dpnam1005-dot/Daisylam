@@ -328,7 +328,7 @@
         // Hàm Lấy dữ liệu từ Supabase
         async function fetchCustomers() {
             try {
-                const { data, error } = await supabase.from('customers').select('*').order('sales', { ascending: false });
+                const { data, error } = await supabase.from('Quan ly ban hang').select('*').order('sales', { ascending: false });
                 if (error) {
                     console.error("Lỗi lấy dữ liệu:", error);
                     document.getElementById('tableBody').innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px;">Lỗi khi tải dữ liệu. Vui lòng kiểm tra RLS (Row Level Security) trên Supabase.</td></tr>`;
@@ -530,7 +530,7 @@
 
             if (isUpdating) {
                 const payload = mapToSupabase(data);
-                const { error } = await supabase.from('customers').update(payload).eq('customer_id', data.customerId);
+                const { error } = await supabase.from('Quan ly ban hang').update(payload).eq('customer_id', data.customerId);
                 if (error) alert("Lỗi cập nhật CSDL: " + error.message);
             } else {
                 const exists = customers.find(c => String(c.customerId || '').toLowerCase() === String(data.customerId || '').toLowerCase());
@@ -544,7 +544,7 @@
                 } else {
                     data.history = [{ date: data.lastUpdated, amount: data.sales, note: 'Tạo mới' }];
                     const payload = mapToSupabase(data);
-                    const { error } = await supabase.from('customers').insert([payload]);
+                    const { error } = await supabase.from('Quan ly ban hang').insert([payload]);
                     if (error) alert("Lỗi khi thêm mới CSDL: " + error.message);
                 }
             }
@@ -610,7 +610,7 @@
         document.getElementById('btnConfirmDelete').addEventListener('click', async function() { 
             if (customerToDelete) { 
                 btnConfirmDelete.innerText = 'Đang xóa...'; btnConfirmDelete.disabled = true;
-                const { error } = await supabase.from('customers').delete().eq('customer_id', customerToDelete);
+                const { error } = await supabase.from('Quan ly ban hang').delete().eq('customer_id', customerToDelete);
                 btnConfirmDelete.innerText = 'Xóa'; btnConfirmDelete.disabled = false;
                 
                 if (error) alert("Lỗi khi xóa: " + error.message);
@@ -634,7 +634,7 @@
                 btn.innerText = 'Đang cập nhật...'; btn.disabled = true;
                 
                 const payload = mapToSupabase(pendingCustomerData);
-                const { error } = await supabase.from('customers').update(payload).eq('customer_id', pendingCustomerData.customerId);
+                const { error } = await supabase.from('Quan ly ban hang').update(payload).eq('customer_id', pendingCustomerData.customerId);
                 
                 btn.innerText = 'Có, Cập nhật'; btn.disabled = false;
                 if (error) alert("Lỗi cập nhật: " + error.message);
@@ -796,7 +796,7 @@
                         btnImportExcel.innerText = "Đang xử lý..."; btnImportExcel.disabled = true;
                         
                         // Đẩy mảng dữ liệu lên Supabase (Ghi đè nếu trùng customer_id)
-                        const { error } = await supabase.from('customers').upsert(payloadsToUpsert, { onConflict: 'customer_id' });
+                        const { error } = await supabase.from('Quan ly ban hang').upsert(payloadsToUpsert, { onConflict: 'customer_id' });
                         
                         btnImportExcel.innerText = "Nhập Excel"; btnImportExcel.disabled = false;
                         
