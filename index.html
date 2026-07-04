@@ -81,12 +81,45 @@
         .modal-actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
         .modal-actions .btn { width: auto; }
         @media (max-width: 768px) { .table-section { min-width: 100%; } }
+
+        /* CSS Màn hình đăng nhập Clean Light Mode */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .auth-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+            color: #334155;
+            border: 1px solid #e2e8f0;
+        }
+        .auth-card h2 { text-align: center; margin-bottom: 24px; color: #0f172a; font-weight: 500; font-size: 26px; margin-top: 0; }
+        .auth-card .form-group { margin-bottom: 20px; }
+        .auth-card label { color: #475569; font-weight: 500; display: block; margin-bottom: 8px; font-size: 14px; text-align: left; }
+        .auth-card .form-control { background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; width: 100%; padding: 10px 14px; border-radius: 6px; font-size: 15px; transition: all 0.15s ease-in-out; }
+        .auth-card .form-control::placeholder { color: #94a3b8; }
+        .auth-card .form-control:focus { border-color: #3cb371; outline: none; box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.15); }
+        .auth-error-msg { color: #ef4444; font-size: 13px; text-align: center; margin-top: 15px; margin-bottom: 5px; display: none; font-weight: 500; }
+        .auth-card .btn-primary { background-color: #3cb371; color: white; padding: 10px 15px; border-radius: 6px; font-weight: 500; width: 100%; font-size: 15px; border: none; cursor: pointer; transition: background-color 0.15s ease; margin-top: 10px; }
+        .auth-card .btn-primary:hover { background-color: #34a265; }
+        .auth-footer-line { border-top: 1px solid #f1f5f9; margin-top: 25px; padding-top: 20px; }
+        .auth-footer-text { text-align: center; font-size: 12px; color: #64748b; line-height: 1.5; margin: 0; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
+    <div class="container" id="mainContainer" style="display: none;">
+        <header class="header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px;">
             <h1>Quản lý Doanh số Khách hàng</h1>
+            <button type="button" id="btnLogout" class="btn btn-secondary btn-sm" style="width: auto;">Đăng xuất</button>
         </header>
 
         <div class="main-content">
@@ -206,6 +239,27 @@
         </div>
     </div>
 
+    <div id="authContainer" class="auth-container">
+        <div class="auth-card">
+            <h2 id="authTitle">Đăng Nhập</h2>
+            <form id="authForm">
+                <div class="form-group">
+                    <label for="authId">ID Đăng nhập</label>
+                    <input type="text" id="authId" class="form-control" placeholder="Nhập ID của bạn" required>
+                </div>
+                <div class="form-group">
+                    <label for="authPassword">Mật khẩu</label>
+                    <input type="password" id="authPassword" class="form-control" placeholder="Nhập mật khẩu" required>
+                </div>
+                <div id="authErrorMsg" class="auth-error-msg"></div>
+                <button type="submit" id="btnAuthSubmit" class="btn btn-primary">Đăng nhập</button>
+            </form>
+            <div class="auth-footer-line">
+                <p class="auth-footer-text">Hệ thống nội bộ. Tài khoản chỉ được cấp bởi Quản trị viên.</p>
+            </div>
+        </div>
+    </div>
+
     <div id="reportModal" class="modal-overlay">
         <div class="modal-content" style="width: 800px; max-width: 95%;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -322,6 +376,108 @@
         let pendingNotification = null;
         let currentPage = 1;
         const itemsPerPage = 10;
+
+        // Elements cho chức năng Đăng nhập / Đăng xuất
+        const authContainer = document.getElementById('authContainer');
+        const mainContainer = document.getElementById('mainContainer');
+        const authForm = document.getElementById('authForm');
+        const authId = document.getElementById('authId');
+        const authPassword = document.getElementById('authPassword');
+        const authErrorMsg = document.getElementById('authErrorMsg');
+        const btnLogout = document.getElementById('btnLogout');
+
+        // Xử lý gửi form Đăng nhập bằng bảng cơ sở dữ liệu ID login
+        if (authForm) {
+            authForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const id = authId.value.trim();
+                const password = authPassword.value;
+                const btnSubmit = document.getElementById('btnAuthSubmit');
+                
+                btnSubmit.innerText = 'Đang đăng nhập...';
+                btnSubmit.disabled = true;
+                authErrorMsg.style.display = 'none';
+
+                try {
+                    if (!supabaseClient) {
+                        throw new Error("Không có kết nối đến cơ sở dữ liệu Supabase.");
+                    }
+                    
+                    // Truy vấn bảng 'ID login' để đối chiếu id và pass_id
+                    const { data, error } = await supabaseClient
+                        .from('ID login')
+                        .select('id, pass_id')
+                        .eq('id', id)
+                        .eq('pass_id', password);
+
+                    if (error) throw error;
+
+                    if (data && data.length > 0) {
+                        // Đăng nhập thành công -> Lưu session vào localStorage
+                        localStorage.setItem('daisylam_session', id);
+                        
+                        // Cập nhật giao diện hiển thị bảng điều khiển
+                        authContainer.style.display = 'none';
+                        mainContainer.style.display = 'block';
+                        btnLogout.style.display = 'block';
+                        
+                        // Tải dữ liệu khách hàng
+                        fetchCustomers();
+                    } else {
+                        throw new Error("Tên đăng nhập hoặc mật khẩu không chính xác.");
+                    }
+                } catch (err) {
+                    console.error("Lỗi đăng nhập:", err);
+                    authErrorMsg.innerText = err.message || "Không thể đăng nhập lúc này. Vui lòng thử lại.";
+                    authErrorMsg.style.display = 'block';
+                    btnSubmit.innerText = 'Đăng Nhập';
+                    btnSubmit.disabled = false;
+                }
+            });
+        }
+
+        // Xử lý nút Đăng xuất
+        if (btnLogout) {
+            btnLogout.addEventListener('click', function() {
+                if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?")) {
+                    // Xóa session khỏi localStorage
+                    localStorage.removeItem('daisylam_session');
+                    
+                    // Khóa giao diện điều khiển và hiển thị lại khung đăng nhập
+                    authContainer.style.display = 'flex';
+                    mainContainer.style.display = 'none';
+                    btnLogout.style.display = 'none';
+                    
+                    // Reset thông tin trong biểu mẫu
+                    if (authForm) authForm.reset();
+                    const btnSubmit = document.getElementById('btnAuthSubmit');
+                    if (btnSubmit) {
+                        btnSubmit.innerText = 'Đăng Nhập';
+                        btnSubmit.disabled = false;
+                    }
+                }
+            });
+        }
+
+        // Lắng nghe và quản lý trạng thái Đăng nhập tự động bằng localStorage
+        function initAuthListener() {
+            const savedSession = localStorage.getItem('daisylam_session');
+            if (savedSession) {
+                // Đã đăng nhập trước đó -> Tự động cho vào giao diện chính
+                if (authContainer) authContainer.style.display = 'none';
+                if (mainContainer) mainContainer.style.display = 'block';
+                if (btnLogout) btnLogout.style.display = 'block';
+                
+                // Tải dữ liệu khách hàng
+                fetchCustomers();
+            } else {
+                // Chưa đăng nhập -> Hiện khung khóa ứng dụng
+                if (authContainer) authContainer.style.display = 'flex';
+                if (mainContainer) mainContainer.style.display = 'none';
+                if (btnLogout) btnLogout.style.display = 'none';
+            }
+        }
+
 
         function mapFromSupabase(row) {
             let parsedHistory = [];
@@ -864,7 +1020,7 @@
         });
 
         // Bắt đầu chạy
-        fetchCustomers();
+        initAuthListener();
     </script>
 </body>
 </html>
