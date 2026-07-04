@@ -8,6 +8,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        if (!window.supabase) {
+            console.warn("jsDelivr failed to load Supabase. Retrying with UNPKG CDN...");
+            document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');
+        }
+    </script>
     <style>
         /* CSS Hệ thống */
         :root {
@@ -274,12 +280,40 @@
     </div>
 
     <script>
+        // Bắt lỗi toàn hệ thống và hiển thị trực tiếp lên giao diện để dễ debug
+        window.onerror = function (message, source, lineno, colno, error) {
+            const tableBody = document.getElementById('tableBody');
+            if (tableBody) {
+                tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
+                    <b>Lỗi hệ thống (JavaScript Error):</b> ${message}<br>
+                    <small style="color: var(--text-muted);">Tại: ${source ? source.split('/').pop() : 'unknown'}:${lineno}:${colno}</small>
+                </td></tr>`;
+            }
+            return false;
+        };
+
         // === KHỞI TẠO DỊCH VỤ SUPABASE ===
         const _supabaseUrl = 'https://ozpaslchfhcdechmrhlv.supabase.co';
         const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96cGFzbGNoZmhjZGVjaG1yaGx2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxMTQxMDUsImV4cCI6MjA5ODY5MDEwNX0.Ekzyal8ona_CjoBkHV19iaDm20DXqCV4MJanSseZ1lo';
         
-        // Khai báo duy nhất biến supabase bằng const để tránh lỗi declared
-        const supabase = window.supabase.createClient(_supabaseUrl, _supabaseKey);
+        let supabaseClient;
+        try {
+            if (!window.supabase) {
+                throw new Error("Không thể tải thư viện Supabase từ CDN (jsDelivr / UNPKG). Vui lòng kiểm tra lại kết nối Internet.");
+            }
+            supabaseClient = window.supabase.createClient(_supabaseUrl, _supabaseKey);
+        } catch (e) {
+            console.error(e);
+            document.addEventListener("DOMContentLoaded", () => {
+                const tableBody = document.getElementById('tableBody');
+                if (tableBody) {
+                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
+                        <b>Lỗi khởi tạo ứng dụng:</b> ${e.message}<br>
+                        <span style="color: var(--text-muted); font-size: 13px;">Vui lòng thử đổi DNS hoặc bật VPN, rồi tải lại trang (F5).</span>
+                    </td></tr>`;
+                }
+            });
+        }
 
         let customers = [];
         let isEditing = false;
@@ -334,8 +368,12 @@
             try {
                 tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang tải dữ liệu từ máy chủ Supabase...</td></tr>`;
                 
+                if (!supabaseClient) {
+                    throw new Error("Kết nối Supabase chưa được thiết lập. Hãy kiểm tra lỗi khởi tạo ở trên.");
+                }
+                
                 const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Quá thời gian 10 giây. Hãy kiểm tra lại kết nối mạng!")), 10000));
-                const fetchPromise = supabase.from('Quan ly ban hang').select('*').order('sales', { ascending: false });
+                const fetchPromise = supabaseClient.from('Quan ly ban hang').select('*').order('sales', { ascending: false });
                 
                 const { data, error } = await Promise.race([fetchPromise, timeout]);
                 
@@ -543,7 +581,7 @@
 
             if (isUpdating) {
                 const payload = mapToSupabase(data);
-                const { error } = await supabase.from('Quan ly ban hang').update(payload).eq('customer_id', data.customerId);
+                const { error } = await supabaseClient.from('Quan ly ban hang').update(payload).eq('customer_id', data.customerId);
                 if (error) alert("Lỗi khi cập nhật máy chủ: " + error.message);
             } else {
                 const exists = customers.find(c => String(c.customerId || '').toLowerCase() === String(data.customerId || '').toLowerCase());
@@ -557,7 +595,7 @@
                 } else {
                     data.history = [{ date: data.lastUpdated, amount: data.sales, note: 'Tạo mới' }];
                     const payload = mapToSupabase(data);
-                    const { error } = await supabase.from('Quan ly ban hang').insert([payload]);
+                    const { error } = await supabaseClient.from('Quan ly ban hang').insert([payload]);
                     if (error) alert("Lỗi khi thêm mới dữ liệu: " + error.message);
                 }
             }
@@ -622,7 +660,7 @@
             if (customerToDelete) { 
                 document.getElementById('btnConfirmDelete').innerText = 'Đang xóa...';
                 document.getElementById('btnConfirmDelete').disabled = true;
-                const { error } = await supabase.from('Quan ly ban hang').delete().eq('customer_id', customerToDelete);
+                const { error } = await supabaseClient.from('Quan ly ban hang').delete().eq('customer_id', customerToDelete);
                 document.getElementById('btnConfirmDelete').innerText = 'Xóa';
                 document.getElementById('btnConfirmDelete').disabled = false;
                 
@@ -647,7 +685,7 @@
                 btn.innerText = 'Đang ghi đè...'; btn.disabled = true;
                 
                 const payload = mapToSupabase(pendingCustomerData);
-                const { error } = await supabase.from('Quan ly ban hang').update(payload).eq('customer_id', pendingCustomerData.customerId);
+                const { error } = await supabaseClient.from('Quan ly ban hang').update(payload).eq('customer_id', pendingCustomerData.customerId);
                 
                 btn.innerText = 'Có, Cập nhật'; btn.disabled = false;
                 if (error) alert("Gặp lỗi khi ghi đè dữ liệu: " + error.message);
@@ -803,7 +841,7 @@
                         notificationModal.style.display = 'flex';
                     } else {
                         btnImportExcel.innerText = "Đang tải dữ liệu..."; btnImportExcel.disabled = true;
-                        const { error } = await supabase.from('Quan ly ban hang').upsert(payloadsToUpsert, { onConflict: 'customer_id' });
+                        const { error } = await supabaseClient.from('Quan ly ban hang').upsert(payloadsToUpsert, { onConflict: 'customer_id' });
                         btnImportExcel.innerText = "Nhập Excel"; btnImportExcel.disabled = false;
                         
                         if (error) {
