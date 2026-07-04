@@ -274,16 +274,12 @@
     </div>
 
     <script>
-        // === KHỞI TẠO DỊCH VỤ SUPABASE (ĐÃ CẬP NHẬT CREDENTIALS MỚI) ===
+        // === KHỞI TẠO DỊCH VỤ SUPABASE ===
         const _supabaseUrl = 'https://ozpaslchfhcdechmrhlv.supabase.co';
-        const _supabaseKey = 'sb_publishable_iLZ9CeyE4Qw0jjOJpjU1Og_BuTiTwLo';
+        const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96cGFzbGNoZmhjZGVjaG1yaGx2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxMTQxMDUsImV4cCI6MjA5ODY5MDEwNX0.Ekzyal8ona_CjoBkHV19iaDm20DXqCV4MJanSseZ1lo';
         
-        let supabase = null;
-        try {
-            supabase = window.supabase.createClient(_supabaseUrl, _supabaseKey);
-        } catch (e) {
-            console.error("Lỗi liên kết thư viện Supabase:", e);
-        }
+        // Khai báo duy nhất biến supabase bằng const để tránh lỗi declared
+        const supabase = window.supabase.createClient(_supabaseUrl, _supabaseKey);
 
         let customers = [];
         let isEditing = false;
@@ -293,7 +289,6 @@
         let currentPage = 1;
         const itemsPerPage = 10;
 
-        // Chuyển dữ liệu từ Database (snake_case) thành dữ liệu JavaScript (camelCase)
         function mapFromSupabase(row) {
             let parsedHistory = [];
             if (typeof row.history === 'string') {
@@ -302,57 +297,34 @@
                 parsedHistory = row.history;
             }
             return {
-                customerId: row.customer_id,
-                taxId: row.tax_id,
-                companyName: row.company_name,
-                classification: row.classification,
-                contactName: row.contact_name,
-                phone: row.phone,
-                sales: row.sales,
-                notes: row.notes,
-                lastUpdated: row.updated_at,
-                history: parsedHistory
+                customerId: row.customer_id, taxId: row.tax_id, companyName: row.company_name,
+                classification: row.classification, contactName: row.contact_name, phone: row.phone,
+                sales: row.sales, notes: row.notes, lastUpdated: row.updated_at, history: parsedHistory
             };
         }
 
-        // Chuyển dữ liệu từ JavaScript lên Database
         function mapToSupabase(c) {
             return {
-                customer_id: c.customerId,
-                tax_id: c.taxId,
-                company_name: c.companyName,
-                classification: c.classification,
-                contact_name: c.contactName,
-                phone: c.phone,
-                sales: c.sales,
-                notes: c.notes,
-                updated_at: c.lastUpdated,
-                history: c.history
+                customer_id: c.customerId, tax_id: c.taxId, company_name: c.companyName,
+                classification: c.classification, contact_name: c.contactName, phone: c.phone,
+                sales: c.sales, notes: c.notes, updated_at: c.lastUpdated, history: c.history
             };
         }
 
-        // Hàm Đọc toàn bộ danh sách khách hàng từ máy chủ
         async function fetchCustomers() {
             const tableBody = document.getElementById('tableBody');
-            if (!supabase) {
-                tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px;"><b>Lỗi hệ thống:</b> Không tải được tệp liên kết máy chủ. Hãy kiểm tra mạng Adblock.</td></tr>`;
-                return;
-            }
-
             try {
-                tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang kết nối và tải dữ liệu từ máy chủ...</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang tải dữ liệu từ máy chủ Supabase...</td></tr>`;
                 
-                // Cơ chế tự động ngắt kết nối sau 10s để hiển thị mã lỗi trực quan
-                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Hết thời gian phản hồi (10s). Vui lòng tải lại trang hoặc kiểm tra mạng!")), 10000));
+                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Quá thời gian 10 giây. Hãy kiểm tra lại kết nối mạng!")), 10000));
                 const fetchPromise = supabase.from('Quan ly ban hang').select('*').order('sales', { ascending: false });
                 
                 const { data, error } = await Promise.race([fetchPromise, timeout]);
                 
                 if (error) {
-                    console.error("Lỗi SQL:", error);
+                    console.error("Lỗi từ Supabase:", error);
                     tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
                         <b>Lỗi máy chủ:</b> ${error.message} <br>
-                        <i>Gợi ý: Kiểm tra lại tên bảng trên Supabase xem đã trùng khớp 100% là <b>Quan ly ban hang</b> chưa (Chú ý không để dư dấu cách thừa).</i>
                     </td></tr>`;
                     return;
                 }
@@ -362,12 +334,11 @@
             } catch(e) {
                 console.error("Lỗi hệ thống:", e);
                 tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
-                    <b>Lỗi kết nối:</b> ${e.message}
+                    <b>Lỗi kết nối mạng:</b> ${e.message}
                 </td></tr>`;
             }
         }
 
-        // Gọi các DOM Elements
         const form = document.getElementById('customerForm');
         const searchInput = document.getElementById('searchInput');
         const tableBodyElement = document.getElementById('tableBody');
@@ -406,7 +377,6 @@
         const fileInputExcel = document.getElementById('fileInputExcel');
         let customerToDelete = null;
 
-        // Auto format dấu phẩy tiền tệ khi gõ
         function formatInputWithCommas(e) {
             let isNegative = this.value.startsWith('-');
             let rawValue = this.value.replace(/\D/g, ''); 
@@ -625,7 +595,6 @@
             handleSaveAction(data, true); 
         });
 
-        // Event Modals & Buttons
         document.getElementById('btnCloseNotification').addEventListener('click', function() { notificationModal.style.display = 'none'; });
         document.getElementById('btnConfirmWarning').addEventListener('click', function() { if (pendingActionData) proceedWithSave(pendingActionData.data, pendingActionData.isUpdating); warningModal.style.display = 'none'; pendingActionData = null; });
         document.getElementById('btnCancelWarning').addEventListener('click', function() { warningModal.style.display = 'none'; pendingActionData = null; });
@@ -683,7 +652,6 @@
             return filtered;
         }
 
-        // TÍNH NĂNG XUẤT EXCEL
         document.getElementById('btnExportExcel').addEventListener('click', function() {
             const data = getFilteredAndSortedData(); if (data.length === 0) return;
             const exportData = data.map((c, index) => ({
@@ -695,7 +663,6 @@
             XLSX.utils.book_append_sheet(wb, ws, "Doanh_So_Khach_Hang"); XLSX.writeFile(wb, "Bang_Xep_Hang_Doanh_So.xlsx");
         });
 
-        // TÍNH NĂNG XUẤT PDF
         document.getElementById('btnExportPDF').addEventListener('click', function() {
             const data = getFilteredAndSortedData(); if (data.length === 0) return;
             const tableBodyData = [];
@@ -717,7 +684,6 @@
             pdfMake.createPdf(docDefinition).download('Bang_Xep_Hang_Doanh_So.pdf');
         });
 
-        // HỆ THỐNG BÁO CÁO THÁNG
         const reportMonthSelect = document.getElementById('reportMonthSelect');
         document.getElementById('btnCloseReport').addEventListener('click', () => { document.getElementById('reportModal').style.display = 'none'; });
         function populateMonthSelect() {
@@ -764,7 +730,6 @@
         reportMonthSelect.addEventListener('change', showRevenueReport);
         document.getElementById('btnReportMonth').addEventListener('click', () => { populateMonthSelect(); showRevenueReport(); });
 
-        // TÍNH NĂNG NHẬP DỮ LIỆU TỪ FILE EXCEL
         const btnImportExcel = document.getElementById('btnImportExcel');
         btnImportExcel.addEventListener('click', function() { fileInputExcel.value = null; fileInputExcel.click(); });
 
@@ -792,14 +757,12 @@
                         if (typeof salesVal === 'string') salesVal = Number(salesVal.replace(/[,.]/g, '')) || 0;
 
                         const newCustomer = {
-                            customerId: custId,
-                            taxId: String(normRow["mst"] || normRow["mã số thuế"] || normRow["taxid"] || "").trim(),
+                            customerId: custId, taxId: String(normRow["mst"] || normRow["mã số thuế"] || normRow["taxid"] || "").trim(),
                             companyName: String(normRow["tên công ty"] || normRow["công ty"] || normRow["companyname"] || "").trim(),
                             classification: String(normRow["phân loại"] || normRow["phân loại khách hàng"] || normRow["classification"] || "").trim(),
                             contactName: String(normRow["người liên hệ"] || normRow["người lh"] || normRow["contactname"] || "").trim(),
                             phone: String(normRow["số điện thoại"] || normRow["sđt"] || normRow["phone"] || "").trim(),
-                            sales: Number(salesVal) || 0,
-                            notes: String(normRow["ghi chú"] || normRow["notes"] || "").trim(),
+                            sales: Number(salesVal) || 0, notes: String(normRow["ghi chú"] || normRow["notes"] || "").trim(),
                             lastUpdated: new Date().toISOString()
                         };
 
@@ -822,8 +785,6 @@
                         notificationModal.style.display = 'flex';
                     } else {
                         btnImportExcel.innerText = "Đang tải dữ liệu..."; btnImportExcel.disabled = true;
-                        
-                        // Thực thi đồng bộ Upsert lên Supabase theo mảng cấu trúc lớn
                         const { error } = await supabase.from('Quan ly ban hang').upsert(payloadsToUpsert, { onConflict: 'customer_id' });
                         btnImportExcel.innerText = "Nhập Excel"; btnImportExcel.disabled = false;
                         
@@ -846,7 +807,7 @@
             reader.readAsArrayBuffer(file);
         });
 
-        // CHẠY HÀM TẢI DỮ LIỆU BAN ĐẦU
+        // Bắt đầu chạy
         fetchCustomers();
     </script>
 </body>
