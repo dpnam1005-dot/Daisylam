@@ -118,7 +118,7 @@
 <body>
     <div class="container" id="mainContainer" style="display: none;">
         <header class="header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px;">
-            <h1>Doanh Số Khách Hàng</h1>
+            <h1>Doanh số Khách hàng</h1>
             <button type="button" id="btnLogout" class="btn btn-secondary btn-sm" style="width: auto;">Đăng xuất</button>
         </header>
 
@@ -386,7 +386,7 @@
         const authErrorMsg = document.getElementById('authErrorMsg');
         const btnLogout = document.getElementById('btnLogout');
 
-        // Xử lý gửi form Đăng nhập bằng bảng cơ sở dữ liệu ID login
+        // Xử lý gửi form Đăng nhập bằng Supabase Authentication
         if (authForm) {
             authForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -403,78 +403,73 @@
                         throw new Error("Không có kết nối đến cơ sở dữ liệu Supabase.");
                     }
                     
-                    // Truy vấn bảng 'ID login' để đối chiếu id và pass_id
-                    const { data, error } = await supabaseClient
-                        .from('ID login')
-                        .select('id, pass_id')
-                        .eq('id', id)
-                        .eq('pass_id', password);
+                    // Tự động map ID thành định dạng Email cho Supabase Auth (ví dụ: hieuhanh -> hieuhanh@daisylam.id.vn)
+                    const email = id.includes('@') ? id : `${id}@daisylam.id.vn`;
+                    
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
 
                     if (error) throw error;
-
-                    if (data && data.length > 0) {
-                        // Đăng nhập thành công -> Lưu session vào localStorage
-                        localStorage.setItem('daisylam_session', id);
-                        
-                        // Cập nhật giao diện hiển thị bảng điều khiển
-                        authContainer.style.display = 'none';
-                        mainContainer.style.display = 'block';
-                        btnLogout.style.display = 'block';
-                        
-                        // Tải dữ liệu khách hàng
-                        fetchCustomers();
-                    } else {
-                        throw new Error("Tên đăng nhập hoặc mật khẩu không chính xác.");
-                    }
+                    
+                    // Khi đăng nhập thành công, onAuthStateChange sẽ tự động cập nhật UI
                 } catch (err) {
                     console.error("Lỗi đăng nhập:", err);
-                    authErrorMsg.innerText = err.message || "Không thể đăng nhập lúc này. Vui lòng thử lại.";
+                    authErrorMsg.innerText = err.message || "Tên đăng nhập hoặc mật khẩu không chính xác.";
                     authErrorMsg.style.display = 'block';
-                    btnSubmit.innerText = 'Đăng Nhập';
+                    btnSubmit.innerText = 'Đăng nhập';
                     btnSubmit.disabled = false;
                 }
             });
         }
 
-        // Xử lý nút Đăng xuất
+        // Xử lý nút Đăng xuất bằng Supabase Auth
         if (btnLogout) {
-            btnLogout.addEventListener('click', function() {
+            btnLogout.addEventListener('click', async function() {
                 if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?")) {
-                    // Xóa session khỏi localStorage
-                    localStorage.removeItem('daisylam_session');
-                    
-                    // Khóa giao diện điều khiển và hiển thị lại khung đăng nhập
-                    authContainer.style.display = 'flex';
-                    mainContainer.style.display = 'none';
-                    btnLogout.style.display = 'none';
-                    
-                    // Reset thông tin trong biểu mẫu
-                    if (authForm) authForm.reset();
-                    const btnSubmit = document.getElementById('btnAuthSubmit');
-                    if (btnSubmit) {
-                        btnSubmit.innerText = 'Đăng Nhập';
-                        btnSubmit.disabled = false;
+                    try {
+                        if (supabaseClient) {
+                            await supabaseClient.auth.signOut();
+                        }
+                    } catch (err) {
+                        console.error("Lỗi đăng xuất:", err);
                     }
                 }
             });
         }
 
-        // Lắng nghe và quản lý trạng thái Đăng nhập tự động bằng localStorage
+        // Lắng nghe và quản lý trạng thái Đăng nhập tự động bằng Supabase Auth
         function initAuthListener() {
-            const savedSession = localStorage.getItem('daisylam_session');
-            if (savedSession) {
-                // Đã đăng nhập trước đó -> Tự động cho vào giao diện chính
-                if (authContainer) authContainer.style.display = 'none';
-                if (mainContainer) mainContainer.style.display = 'block';
-                if (btnLogout) btnLogout.style.display = 'block';
-                
-                // Tải dữ liệu khách hàng
-                fetchCustomers();
+            if (supabaseClient) {
+                supabaseClient.auth.onAuthStateChange((event, session) => {
+                    console.log("Sự kiện Auth:", event, session);
+                    if (session) {
+                        // Đã đăng nhập thành công
+                        if (authContainer) authContainer.style.display = 'none';
+                        if (mainContainer) mainContainer.style.display = 'block';
+                        if (btnLogout) btnLogout.style.display = 'block';
+                        
+                        // Tải dữ liệu khách hàng
+                        fetchCustomers();
+                    } else {
+                        // Chưa đăng nhập / Đăng xuất
+                        if (authContainer) authContainer.style.display = 'flex';
+                        if (mainContainer) mainContainer.style.display = 'none';
+                        if (btnLogout) btnLogout.style.display = 'none';
+                        
+                        // Reset biểu mẫu đăng nhập
+                        if (authForm) authForm.reset();
+                        const btnSubmit = document.getElementById('btnAuthSubmit');
+                        if (btnSubmit) {
+                            btnSubmit.innerText = 'Đăng nhập';
+                            btnSubmit.disabled = false;
+                        }
+                    }
+                });
             } else {
-                // Chưa đăng nhập -> Hiện khung khóa ứng dụng
                 if (authContainer) authContainer.style.display = 'flex';
                 if (mainContainer) mainContainer.style.display = 'none';
-                if (btnLogout) btnLogout.style.display = 'none';
             }
         }
 
