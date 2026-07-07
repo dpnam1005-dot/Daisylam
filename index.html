@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hiếu Hạnh</title>
+    <title>Quản lý Doanh số Khách hàng</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
@@ -118,7 +118,7 @@
 <body>
     <div class="container" id="mainContainer" style="display: none;">
         <header class="header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px;">
-            <h1>Doanh số Khách hàng</h1>
+            <h1>Quản lý Doanh số Khách hàng</h1>
             <button type="button" id="btnLogout" class="btn btn-secondary btn-sm" style="width: auto;">Đăng xuất</button>
         </header>
 
@@ -500,15 +500,19 @@
         }
 
         function mapToSupabase(c) {
+            const taxVal = c.taxId?.toString().trim();
+            const phoneVal = c.phone?.toString().trim();
+            const salesVal = c.sales?.toString().trim();
+
             return {
                 customer_id: c.customerId?.trim() || '',
-                tax_id: c.taxId?.trim() || '',
+                tax_id: taxVal && !isNaN(Number(taxVal)) ? Number(taxVal) : null,
                 company_name: c.companyName?.trim() || '',
                 classification: c.classification || '',
                 contact_name: c.contactName?.trim() || '',
-                phone: c.phone?.trim() || '',
-                sales: Number(c.sales) || 0,
-                notes: c.notes?.trim() || '',
+                phone: phoneVal && !isNaN(Number(phoneVal)) ? Number(phoneVal) : null,
+                sales: salesVal && !isNaN(Number(salesVal)) ? Number(salesVal) : null,
+                notes: c.notes?.trim() || null,
                 updated_at: c.lastUpdated || new Date().toISOString(),
                 history: Array.isArray(c.history) ? c.history : []
             };
