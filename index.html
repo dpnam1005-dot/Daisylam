@@ -333,6 +333,24 @@
         </div>
     </div>
 
+    <!-- Modal chọn Tháng ghi nhận Excel -->
+    <div id="excelImportModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px; text-align: left; background: white; padding: 20px; border-radius: 8px;">
+            <h3 style="color: var(--primary-color); margin-bottom: 15px; margin-top: 0;">Tháng Ghi Nhận Doanh Thu</h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
+                Vui lòng chọn Tháng và Năm mà doanh thu trong file Excel này được ghi nhận. Hệ thống sẽ lưu lịch sử biến động vào tháng được chọn.
+            </p>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="excelImportMonth" style="display: block; font-weight: bold; margin-bottom: 8px; color: var(--text-main); font-size: 14px;">Ghi nhận vào:</label>
+                <select id="excelImportMonth" class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; background: white; color: var(--text-main); cursor: pointer;"></select>
+            </div>
+            <div class="modal-actions" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" id="btnCancelExcelImport" class="btn btn-secondary" style="width: auto;">Hủy</button>
+                <button type="button" id="btnConfirmExcelImport" class="btn btn-primary" style="width: auto;">Xác nhận & Nhập</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Bắt lỗi toàn hệ thống và hiển thị trực tiếp lên giao diện để dễ debug
         window.onerror = function (message, source, lineno, colno, error) {
@@ -942,23 +960,81 @@
         document.getElementById('btnReportMonth').addEventListener('click', () => { populateMonthSelect(); showRevenueReport(); });
 
         const btnImportExcel = document.getElementById('btnImportExcel');
+        const excelImportModal = document.getElementById('excelImportModal');
+        const excelImportMonth = document.getElementById('excelImportMonth');
+        const btnCancelExcelImport = document.getElementById('btnCancelExcelImport');
+        const btnConfirmExcelImport = document.getElementById('btnConfirmExcelImport');
+        
+        let pendingExcelData = null;
+
         btnImportExcel.addEventListener('click', function() { fileInputExcel.value = null; fileInputExcel.click(); });
 
         fileInputExcel.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = async function(event) {
+            reader.onload = function(event) {
                 try {
                     const data = new Uint8Array(event.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
                     const firstSheetName = workbook.SheetNames[0];
-                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName], { defval: "" }); 
+                    pendingExcelData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName], { defval: "" }); 
                     
-                    let importedCount = 0; let updatedCount = 0;
+                    // Hiển thị modal chọn tháng
+                    populateExcelImportMonths();
+                    excelImportModal.style.display = 'flex';
+                } catch (error) {
+                    alert("Không thể đọc tệp Excel. Vui lòng kiểm tra lại cấu trúc file!");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function populateExcelImportMonths() {
+            if (!excelImportMonth) return;
+            excelImportMonth.innerHTML = '';
+            const now = new Date();
+            for (let i = 0; i < 12; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const month = d.getMonth() + 1;
+                const year = d.getFullYear();
+                const option = document.createElement('option');
+                option.value = `${year}-${month}`;
+                option.text = i === 0 ? `Tháng ${month}/${year} (Tháng này)` : `Tháng ${month}/${year}`;
+                excelImportMonth.appendChild(option);
+            }
+        }
+
+        if (btnCancelExcelImport) {
+            btnCancelExcelImport.addEventListener('click', function() {
+                excelImportModal.style.display = 'none';
+                pendingExcelData = null;
+            });
+        }
+
+        if (btnConfirmExcelImport) {
+            btnConfirmExcelImport.addEventListener('click', async function() {
+                if (!pendingExcelData) return;
+                
+                const selectedValue = excelImportMonth.value;
+                const parts = selectedValue.split('-');
+                const selectedYear = parseInt(parts[0], 10);
+                const selectedMonth = parseInt(parts[1], 10); // 1-indexed
+
+                // Ngày ghi nhận (chọn ngày 28 của tháng đó để an toàn và tránh múi giờ lệch)
+                const targetDate = new Date(selectedYear, selectedMonth - 1, 28, 12, 0, 0).toISOString();
+                const nowStr = new Date().toISOString();
+
+                excelImportModal.style.display = 'none';
+                btnImportExcel.innerText = "Đang xử lý...";
+                btnImportExcel.disabled = true;
+
+                try {
+                    let importedCount = 0;
+                    let updatedCount = 0;
                     const payloadsToUpsert = [];
 
-                    jsonData.forEach(row => {
+                    pendingExcelData.forEach(row => {
                         const normRow = {};
                         for (let k in row) if (row.hasOwnProperty(k)) normRow[k.trim().toLowerCase()] = row[k];
                         const custId = String(normRow["mã kh"] || normRow["mã khách hàng"] || normRow["customerid"] || normRow["mã"] || "").trim();
@@ -968,55 +1044,74 @@
                         if (typeof salesVal === 'string') salesVal = Number(salesVal.replace(/[,.]/g, '')) || 0;
 
                         const newCustomer = {
-                            customerId: custId, taxId: String(normRow["mst"] || normRow["mã số thuế"] || normRow["taxid"] || "").trim(),
+                            customerId: custId,
+                            taxId: String(normRow["mst"] || normRow["mã số thuế"] || normRow["taxid"] || "").trim(),
                             companyName: String(normRow["tên công ty"] || normRow["công ty"] || normRow["companyname"] || "").trim(),
                             classification: String(normRow["phân loại"] || normRow["phân loại khách hàng"] || normRow["classification"] || "").trim(),
                             contactName: String(normRow["người liên hệ"] || normRow["người lh"] || normRow["contactname"] || "").trim(),
                             phone: String(normRow["số điện thoại"] || normRow["sđt"] || normRow["phone"] || "").trim(),
-                            sales: Number(salesVal) || 0, notes: String(normRow["ghi chú"] || normRow["notes"] || "").trim(),
-                            lastUpdated: new Date().toISOString()
+                            sales: Number(salesVal) || 0,
+                            notes: String(normRow["ghi chú"] || normRow["notes"] || "").trim(),
+                            lastUpdated: nowStr
                         };
 
                         const existingIndex = customers.findIndex(c => String(c.customerId).toLowerCase() === custId.toLowerCase());
                         if (existingIndex !== -1) {
+                            // Cập nhật khách hàng cũ: dịch chuyển các bản ghi Excel cũ được ghi trong tháng này về tháng được chọn
+                            const currentMonth = new Date().getMonth();
+                            const currentYear = new Date().getFullYear();
+                            
+                            newCustomer.history = (customers[existingIndex].history || []).map(tx => {
+                                if (tx.note && tx.note.includes("Excel")) {
+                                    const txDate = new Date(tx.date);
+                                    // Nếu giao dịch được ghi trong tháng hiện tại (do import nhầm vừa rồi) -> dịch chuyển về tháng được chọn
+                                    if (txDate.getFullYear() === currentYear && txDate.getMonth() === currentMonth) {
+                                        tx.date = targetDate;
+                                    }
+                                }
+                                return tx;
+                            });
+
                             const diff = newCustomer.sales - (customers[existingIndex].sales || 0);
-                            newCustomer.history = customers[existingIndex].history || [];
-                            if (diff !== 0) newCustomer.history.push({ date: new Date().toISOString(), amount: diff, note: 'Cập nhật qua Excel' });
+                            if (diff !== 0) {
+                                newCustomer.history.push({ date: targetDate, amount: diff, note: 'Cập nhật qua Excel' });
+                            }
                             updatedCount++;
                         } else {
-                            newCustomer.history = [{ date: new Date().toISOString(), amount: newCustomer.sales, note: 'Thêm mới qua Excel' }];
+                            // Khách hàng mới: tạo lịch sử thuộc tháng được chọn
+                            newCustomer.history = [{ date: targetDate, amount: newCustomer.sales, note: 'Thêm mới qua Excel' }];
                             importedCount++;
                         }
                         payloadsToUpsert.push(mapToSupabase(newCustomer));
                     });
 
                     if (payloadsToUpsert.length === 0) {
-                        notificationTitle.innerText = "Lỗi Cấu Trúc File"; notificationTitle.style.color = "#ef4444";
+                        notificationTitle.innerText = "Lỗi Cấu Trúc File";
+                        notificationTitle.style.color = "#ef4444";
                         notificationMessage.innerHTML = "Không thể đọc dữ liệu! Hãy đảm bảo file Excel của bạn có chứa cột tiêu đề <strong>Mã KH</strong>.";
                         notificationModal.style.display = 'flex';
                     } else {
-                        btnImportExcel.innerText = "Đang tải dữ liệu..."; btnImportExcel.disabled = true;
                         const { error } = await supabaseClient.from('Quan ly ban hang').upsert(payloadsToUpsert, { onConflict: 'customer_id' });
-                        btnImportExcel.innerText = "Nhập Excel"; btnImportExcel.disabled = false;
-                        
                         if (error) {
                             alert("Gặp sự cố khi đồng bộ lên Supabase: " + error.message);
                         } else {
                             await fetchCustomers();
-                            notificationTitle.innerText = "Nhập Excel Thành Công!"; notificationTitle.style.color = "#10b981";
-                            notificationMessage.innerHTML = `Đã thêm mới: <strong>${importedCount}</strong> khách hàng.<br>Đã cập nhật: <strong>${updatedCount}</strong> khách hàng (do trùng mã).`;
+                            notificationTitle.innerText = "Nhập Excel Thành Công!";
+                            notificationTitle.style.color = "#10b981";
+                            notificationMessage.innerHTML = `Đã thêm mới: <strong>${importedCount}</strong> khách hàng.<br>Đã cập nhật: <strong>${updatedCount}</strong> khách hàng.<br>Dữ liệu lịch sử đã được ghi nhận vào: <strong>Tháng ${selectedMonth}/${selectedYear}</strong>.`;
                             notificationModal.style.display = 'flex';
                         }
                     }
                 } catch (error) {
-                    btnImportExcel.innerText = "Nhập Excel"; btnImportExcel.disabled = false;
-                    notificationTitle.innerText = "Lỗi Nhập File"; notificationTitle.style.color = "#ef4444";
-                    notificationMessage.innerHTML = "Không thể xử lý dữ liệu tệp Excel. Vui lòng kiểm tra lại cấu trúc bảng!";
-                    notificationModal.style.display = 'flex';
+                    console.error(error);
+                    alert("Đã xảy ra lỗi trong quá trình xử lý dữ liệu nhập.");
+                } finally {
+                    btnImportExcel.innerText = "Nhập Excel";
+                    btnImportExcel.disabled = false;
+                    pendingExcelData = null;
                 }
-            };
-            reader.readAsArrayBuffer(file);
-        });
+            });
+        }
 
         // Bắt đầu chạy
         initAuthListener();
