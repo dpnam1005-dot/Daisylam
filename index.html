@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Doanh số Khách hàng</title>
+    <title>Hiếu Hạnh QLDS</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
@@ -118,7 +118,7 @@
 <body>
     <div class="container" id="mainContainer" style="display: none;">
         <header class="header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px;">
-            <h1>Quản lý Doanh số Khách hàng</h1>
+            <h1>Doanh số Khách hàng</h1>
             <button type="button" id="btnLogout" class="btn btn-secondary btn-sm" style="width: auto;">Đăng xuất</button>
         </header>
 
@@ -224,12 +224,11 @@
                                 <th class="nowrap">Người liên hệ</th>
                                 <th class="nowrap">SĐT</th>
                                 <th class="text-right nowrap">Doanh số KH</th>
-                                <th class="nowrap">Ngày cập nhật</th>
                                 <th class="col-notes">Ghi chú</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                            <tr><td colspan="9" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang kết nối và tải dữ liệu từ máy chủ...</td></tr>
+                            <tr><td colspan="8" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang kết nối và tải dữ liệu từ máy chủ...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -388,6 +387,7 @@
         }
 
         let customers = [];
+        let currentUserEmail = null;
         let isEditing = false;
         let pendingCustomerData = null;
         let pendingActionData = null;
@@ -464,6 +464,7 @@
                     console.log("Sự kiện Auth:", event, session);
                     if (session) {
                         // Đã đăng nhập thành công
+                        currentUserEmail = session.user?.email || null;
                         if (authContainer) authContainer.style.display = 'none';
                         if (mainContainer) mainContainer.style.display = 'block';
                         if (btnLogout) btnLogout.style.display = 'block';
@@ -472,6 +473,7 @@
                         fetchCustomers();
                     } else {
                         // Chưa đăng nhập / Đăng xuất
+                        currentUserEmail = null;
                         if (authContainer) authContainer.style.display = 'flex';
                         if (mainContainer) mainContainer.style.display = 'none';
                         if (btnLogout) btnLogout.style.display = 'none';
@@ -513,6 +515,7 @@
                 sales: Number(row.sales) || 0,
                 notes: row.notes || '',
                 lastUpdated: row.updated_at || '',
+                updatedBy: row.updated_by || '',
                 history: parsedHistory
             };
         }
@@ -522,16 +525,22 @@
             const phoneVal = c.phone?.toString().trim();
             const salesVal = c.sales?.toString().trim();
 
+            let formattedPhone = phoneVal || null;
+            if (phoneVal && /^\d+$/.test(phoneVal) && !phoneVal.startsWith('0') && !phoneVal.startsWith('+')) {
+                formattedPhone = '0' + phoneVal;
+            }
+
             return {
                 customer_id: c.customerId?.trim() || '',
-                tax_id: taxVal && !isNaN(Number(taxVal)) ? Number(taxVal) : null,
+                tax_id: taxVal || null,
                 company_name: c.companyName?.trim() || '',
                 classification: c.classification || '',
                 contact_name: c.contactName?.trim() || '',
-                phone: phoneVal && !isNaN(Number(phoneVal)) ? Number(phoneVal) : null,
+                phone: formattedPhone,
                 sales: salesVal && !isNaN(Number(salesVal)) ? Number(salesVal) : null,
                 notes: c.notes?.trim() || null,
                 updated_at: c.lastUpdated || new Date().toISOString(),
+                updated_by: currentUserEmail ? currentUserEmail.split('@')[0] : 'hệ thống',
                 history: Array.isArray(c.history) ? c.history : []
             };
         }
@@ -539,7 +548,7 @@
         async function fetchCustomers() {
             const tableBody = document.getElementById('tableBody');
             try {
-                tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang tải dữ liệu từ máy chủ Supabase...</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang tải dữ liệu từ máy chủ Supabase...</td></tr>`;
                 
                 if (!supabaseClient) {
                     throw new Error("Kết nối Supabase chưa được thiết lập. Hãy kiểm tra lỗi khởi tạo ở trên.");
@@ -552,7 +561,7 @@
                 
                 if (error) {
                     console.error("Lỗi từ Supabase:", error);
-                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
+                    tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
                         <b>Lỗi máy chủ:</b> ${error.message} <br>
                     </td></tr>`;
                     return;
@@ -562,7 +571,7 @@
                 renderTable();
             } catch(e) {
                 console.error("Lỗi hệ thống:", e);
-                tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
                     <b>Lỗi kết nối mạng:</b> ${e.message}
                 </td></tr>`;
             }
@@ -625,6 +634,16 @@
         addSalesInput.addEventListener('input', formatInputWithCommas);
 
         function formatCurrency(amount) { return Number(amount).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }); }
+        function formatPhoneNumber(phoneVal) {
+            if (!phoneVal) return '-';
+            let str = phoneVal.toString().trim();
+            if (!str || str === '-') return '-';
+            // Nếu là số thuần túy và không bắt đầu bằng '0' hoặc '+', tự động thêm '0' ở đầu
+            if (/^\d+$/.test(str) && !str.startsWith('0') && !str.startsWith('+')) {
+                return '0' + str;
+            }
+            return str;
+        }
         function formatDateTime(isoString) {
             if (!isoString) return '-';
             const d = new Date(isoString);
@@ -650,7 +669,7 @@
         function setFormData(data) {
             if (idInput) idInput.value = data.customerId || ''; if (taxIdInput) taxIdInput.value = data.taxId || '';
             if (companyInput) companyInput.value = data.companyName || ''; if (classificationInput) classificationInput.value = data.classification || '';
-            if (contactInput) contactInput.value = data.contactName || ''; if (phoneInput) phoneInput.value = data.phone || '';
+            if (contactInput) contactInput.value = data.contactName || ''; if (phoneInput) phoneInput.value = data.phone ? formatPhoneNumber(data.phone) : '';
             if (salesInput) salesInput.value = data.sales || data.sales === 0 ? data.sales.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '';
             if (notesInput) notesInput.value = data.notes || '';
             if (addSalesInput) { addSalesInput.value = ''; addSalesInput.style.borderColor = 'var(--border-color)'; addSalesInput.style.color = 'var(--text-main)'; }
@@ -710,7 +729,7 @@
             
             tableBodyElement.innerHTML = '';
             if (paginatedItems.length === 0) {
-                tableBodyElement.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #94a3b8; padding: 30px;">Không có dữ liệu.</td></tr>`;
+                tableBodyElement.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #94a3b8; padding: 30px;">Không có dữ liệu.</td></tr>`;
                 paginationContainer.innerHTML = ''; return;
             }
             paginatedItems.forEach((customer, index) => {
@@ -725,9 +744,8 @@
                     <td class="nowrap">${customer.taxId || '-'}</td>
                     <td><strong>${customer.companyName || '-'}</strong></td>
                     <td class="nowrap">${customer.contactName || '-'}</td>
-                    <td class="nowrap">${customer.phone || '-'}</td>
+                    <td class="nowrap">${formatPhoneNumber(customer.phone)}</td>
                     <td class="text-right money nowrap" style="color: ${salesColor};">${formatCurrency(customer.sales)}</td>
-                    <td class="nowrap" style="font-size: 13px; color: var(--text-muted);">${formatDateTime(customer.lastUpdated)}</td>
                     <td>${customer.notes || '-'}</td>
                 `;
                 tableBodyElement.appendChild(tr);
@@ -766,7 +784,7 @@
                     modal.style.display = 'flex';
                     return;
                 } else {
-                    data.history = [{ date: data.lastUpdated, amount: data.sales, note: 'Tạo mới' }];
+                    data.history = [{ date: data.lastUpdated, amount: data.sales, note: 'Tạo mới', updated_by: currentUserEmail ? currentUserEmail.split('@')[0] : 'hệ thống' }];
                     const payload = mapToSupabase(data);
                     const { error } = await supabaseClient.from('Quan ly ban hang').insert([payload]);
                     if (error) alert("Lỗi khi thêm mới dữ liệu: " + error.message);
@@ -812,7 +830,7 @@
                 const addedSales = Number(addedSalesStr) || 0;
                 if (addedSales !== 0) {
                     data.sales += addedSales; 
-                    data.history.push({ date: new Date().toISOString(), amount: addedSales, note: 'Cập nhật (+/-)' });
+                    data.history.push({ date: new Date().toISOString(), amount: addedSales, note: 'Cập nhật (+/-)', updated_by: currentUserEmail ? currentUserEmail.split('@')[0] : 'hệ thống' });
                     let titleColor = addedSales > 0 ? '#10b981' : '#ef4444';
                     let actionText = addedSales > 0 ? `Tăng thêm ${formatCurrency(addedSales)}` : `Giảm đi ${formatCurrency(Math.abs(addedSales))}`;
                     pendingNotification = {
@@ -886,7 +904,7 @@
             const exportData = data.map((c, index) => ({
                 "STT": index + 1, "Mã KH": c.customerId || "", "Phân loại": c.classification || "",
                 "MST": c.taxId || "", "Tên Công ty": c.companyName || "", "Người liên hệ": c.contactName || "",
-                "Số điện thoại": c.phone || "", "Doanh số KH (VNĐ)": c.sales || 0, "Ngày cập nhật": formatDateTime(c.lastUpdated), "Ghi chú": c.notes || ""
+                "Số điện thoại": formatPhoneNumber(c.phone) === '-' ? '' : formatPhoneNumber(c.phone), "Doanh số KH (VNĐ)": c.sales || 0, "Ngày cập nhật": formatDateTime(c.lastUpdated), "Ghi chú": c.notes || ""
             }));
             const ws = XLSX.utils.json_to_sheet(exportData); const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Doanh_So_Khach_Hang"); XLSX.writeFile(wb, "Bang_Xep_Hang_Doanh_So.xlsx");
@@ -900,7 +918,7 @@
                 let salesColor = c.sales >= 0 ? '#10b981' : '#ef4444'; let maKhColor = (c.classification && classificationColors[c.classification]) ? classificationColors[c.classification] : '#2563eb';
                 tableBodyData.push([
                     { text: (index + 1).toString(), alignment: 'center' }, { text: c.customerId || '-', color: maKhColor, bold: true },
-                    { text: c.taxId || '-' }, { text: c.companyName || '-', bold: true }, { text: c.contactName || '-' }, { text: c.phone || '-' },
+                    { text: c.taxId || '-' }, { text: c.companyName || '-', bold: true }, { text: c.contactName || '-' }, { text: formatPhoneNumber(c.phone) },
                     { text: formatCurrency(c.sales || 0), alignment: 'right', color: salesColor, bold: true },
                     { text: formatDateTime(c.lastUpdated), fontSize: 9 }, { text: c.notes || '-' }
                 ]);
@@ -1074,12 +1092,12 @@
 
                             const diff = newCustomer.sales - (customers[existingIndex].sales || 0);
                             if (diff !== 0) {
-                                newCustomer.history.push({ date: targetDate, amount: diff, note: 'Cập nhật qua Excel' });
+                                newCustomer.history.push({ date: targetDate, amount: diff, note: 'Cập nhật qua Excel', updated_by: currentUserEmail ? currentUserEmail.split('@')[0] : 'hệ thống' });
                             }
                             updatedCount++;
                         } else {
                             // Khách hàng mới: tạo lịch sử thuộc tháng được chọn
-                            newCustomer.history = [{ date: targetDate, amount: newCustomer.sales, note: 'Thêm mới qua Excel' }];
+                            newCustomer.history = [{ date: targetDate, amount: newCustomer.sales, note: 'Thêm mới qua Excel', updated_by: currentUserEmail ? currentUserEmail.split('@')[0] : 'hệ thống' }];
                             importedCount++;
                         }
                         payloadsToUpsert.push(mapToSupabase(newCustomer));
