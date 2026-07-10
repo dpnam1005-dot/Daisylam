@@ -74,6 +74,7 @@
         .pagination-container { display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 5px; }
         .page-btn { padding: 6px 12px; border: 1px solid var(--border-color); background: white; color: var(--text-main); border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
         .page-btn:hover:not(.active):not(:disabled) { background: #f1f5f9; }
+        .history-btn-icon:hover { border-color: var(--primary-color) !important; color: var(--primary-color) !important; background-color: #eff6ff !important; }
         .page-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
         .page-btn:disabled { cursor: not-allowed; opacity: 0.5; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
@@ -81,7 +82,6 @@
         .modal-actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
         .modal-actions .btn { width: auto; }
         @media (max-width: 768px) { .table-section { min-width: 100%; } }
-
         /* CSS Màn hình đăng nhập Clean Light Mode */
         .auth-container {
             display: flex;
@@ -224,11 +224,12 @@
                                 <th class="nowrap">Người liên hệ</th>
                                 <th class="nowrap">SĐT</th>
                                 <th class="text-right nowrap">Doanh số KH</th>
+                                <th class="nowrap text-center">Lịch sử</th>
                                 <th class="col-notes">Ghi chú</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                            <tr><td colspan="8" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang kết nối và tải dữ liệu từ máy chủ...</td></tr>
+                            <tr><td colspan="9" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang kết nối và tải dữ liệu từ máy chủ...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -350,6 +351,37 @@
         </div>
     </div>
 
+    <!-- Modal xem Lịch sử cập nhật -->
+    <div id="historyModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 550px; text-align: left; background: white; padding: 25px; border-radius: 12px; display: flex; flex-direction: column; max-height: 80vh;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                <h3 style="color: var(--primary-color); margin: 0; display: inline-flex; align-items: center; gap: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
+                      <polyline points="1 4 1 10 7 10" />
+                      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                      <circle cx="12" cy="12" r="5.5" fill="currentColor" stroke="none" />
+                      <path d="M12 9.5v2.5l1.5 1.5" stroke="#ffffff" stroke-width="1.5" />
+                    </svg>
+                    <span>Lịch Sử Cập Nhật Chi Tiết</span>
+                </h3>
+                <span id="btnCloseHistoryModal" style="cursor: pointer; font-size: 24px; color: var(--text-muted); font-weight: bold; line-height: 1; transition: color 0.2s;">&times;</span>
+            </div>
+            
+            <div id="historyModalMeta" style="background: #f8fafc; border-left: 4px solid var(--primary-color); padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; color: var(--text-main); line-height: 1.6;">
+                <!-- Tên KH và công ty -->
+            </div>
+            
+            <!-- Danh sách timeline -->
+            <div id="historyTimelineContainer" style="overflow-y: auto; flex: 1; padding-right: 5px; position: relative;">
+                <!-- Timeline items -->
+            </div>
+            
+            <div class="modal-actions" style="margin-top: 20px; display: flex; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <button type="button" id="btnCloseHistoryBtn" class="btn btn-secondary" style="width: auto; min-width: 100px;">Đóng</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Bắt lỗi toàn hệ thống và hiển thị trực tiếp lên giao diện để dễ debug
         window.onerror = function (message, source, lineno, colno, error) {
@@ -363,16 +395,16 @@
             return false;
         };
 
-        // === KHỞI TẠO DỊCH VỤ SUPABASE ===
-        const _supabaseUrl = 'https://ozpaslchfhcdechmrhlv.supabase.co';
-        const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96cGFzbGNoZmhjZGVjaG1yaGx2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxMTQxMDUsImV4cCI6MjA5ODY5MDEwNX0.Ekzyal8ona_CjoBkHV19iaDm20DXqCV4MJanSseZ1lo';
+        // ========== CONFIG ==========
+        const SB_URL = 'https://ozpaslchfhcdechmrhlv.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96cGFzbGNoZmhjZGVjaG1yaGx2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxMTQxMDUsImV4cCI6MjA5ODY5MDEwNX0.Ekzyal8ona_CjoBkHV19iaDm20DXqCV4MJanSseZ1lo';
         
         let supabaseClient;
         try {
             if (!window.supabase) {
                 throw new Error("Không thể tải thư viện Supabase từ CDN (jsDelivr / UNPKG). Vui lòng kiểm tra lại kết nối Internet.");
             }
-            supabaseClient = window.supabase.createClient(_supabaseUrl, _supabaseKey);
+            supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
         } catch (e) {
             console.error(e);
             document.addEventListener("DOMContentLoaded", () => {
@@ -548,7 +580,7 @@
         async function fetchCustomers() {
             const tableBody = document.getElementById('tableBody');
             try {
-                tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang tải dữ liệu từ máy chủ Supabase...</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang tải dữ liệu từ máy chủ Supabase...</td></tr>`;
                 
                 if (!supabaseClient) {
                     throw new Error("Kết nối Supabase chưa được thiết lập. Hãy kiểm tra lỗi khởi tạo ở trên.");
@@ -561,7 +593,7 @@
                 
                 if (error) {
                     console.error("Lỗi từ Supabase:", error);
-                    tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
+                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
                         <b>Lỗi máy chủ:</b> ${error.message} <br>
                     </td></tr>`;
                     return;
@@ -571,7 +603,7 @@
                 renderTable();
             } catch(e) {
                 console.error("Lỗi hệ thống:", e);
-                tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
+                tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
                     <b>Lỗi kết nối mạng:</b> ${e.message}
                 </td></tr>`;
             }
@@ -643,6 +675,106 @@
                 return '0' + str;
             }
             return str;
+        }
+
+        function showHistoryModal(customerId) {
+            const customer = customers.find(c => c.customerId === customerId);
+            if (!customer) return;
+
+            const metaContainer = document.getElementById('historyModalMeta');
+            metaContainer.innerHTML = `
+                <strong>Mã khách hàng:</strong> ${customer.customerId} <br>
+                <strong>Tên Công ty:</strong> ${customer.companyName || '-'}
+            `;
+
+            const timelineContainer = document.getElementById('historyTimelineContainer');
+            timelineContainer.innerHTML = '';
+
+            const history = customer.history || [];
+            if (history.length === 0) {
+                timelineContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">Chưa có lịch sử cập nhật cho khách hàng này.</div>`;
+            } else {
+                // Sắp xếp lịch sử theo thời gian mới nhất lên đầu
+                const sortedHistory = [...history].sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                const ul = document.createElement('div');
+                ul.style.position = 'relative';
+                ul.style.paddingLeft = '24px';
+                ul.style.borderLeft = '2px solid #e2e8f0';
+                ul.style.marginLeft = '12px';
+                ul.style.display = 'flex';
+                ul.style.flexDirection = 'column';
+                ul.style.gap = '20px';
+
+                sortedHistory.forEach(item => {
+                    const itemDate = new Date(item.date);
+                    const formattedDate = itemDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    const formattedTime = itemDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                    const user = item.updated_by || 'hệ thống';
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.style.position = 'relative';
+                    
+                    // Dot
+                    const dot = document.createElement('div');
+                    dot.style.position = 'absolute';
+                    dot.style.left = '-31px';
+                    dot.style.top = '4px';
+                    dot.style.width = '12px';
+                    dot.style.height = '12px';
+                    dot.style.borderRadius = '50%';
+                    dot.style.backgroundColor = 'var(--primary-color)';
+                    dot.style.border = '2px solid white';
+                    itemDiv.appendChild(dot);
+
+                    // Content card
+                    const content = document.createElement('div');
+                    content.style.fontSize = '14px';
+                    content.style.lineHeight = '1.6';
+
+                    // Time header
+                    const timeHeader = document.createElement('div');
+                    timeHeader.style.fontSize = '12px';
+                    timeHeader.style.color = 'var(--text-muted)';
+                    timeHeader.style.fontWeight = 'bold';
+                    timeHeader.innerText = `${formattedDate} LÚC ${formattedTime}`;
+                    content.appendChild(timeHeader);
+
+                    // Action title
+                    const actionTitle = document.createElement('div');
+                    actionTitle.style.fontWeight = 'bold';
+                    actionTitle.style.color = 'var(--text-main)';
+                    actionTitle.style.marginTop = '2px';
+                    actionTitle.innerText = item.note || 'Cập nhật thông tin';
+                    content.appendChild(actionTitle);
+
+                    // Details box
+                    const detailsBox = document.createElement('div');
+                    detailsBox.style.background = '#f8fafc';
+                    detailsBox.style.border = '1px solid #e2e8f0';
+                    detailsBox.style.borderRadius = '6px';
+                    detailsBox.style.padding = '8px 12px';
+                    detailsBox.style.marginTop = '6px';
+                    
+                    let detailsHtml = `<ul style="margin: 0; padding-left: 15px; list-style-type: disc; color: #475569; font-size: 13px;">`;
+                    detailsHtml += `<li>Thực hiện bởi: <strong>${user}</strong></li>`;
+                    if (item.amount !== undefined && item.amount !== null && item.amount !== 0) {
+                        const amountPrefix = item.amount > 0 ? '+' : '';
+                        detailsHtml += `<li>Biến động doanh số: <strong style="color: ${item.amount > 0 ? '#10b981' : '#ef4444'}">${amountPrefix}${formatCurrency(item.amount)}</strong></li>`;
+                    }
+                    detailsHtml += `</ul>`;
+                    
+                    detailsBox.innerHTML = detailsHtml;
+                    content.appendChild(detailsBox);
+
+                    itemDiv.appendChild(content);
+                    ul.appendChild(itemDiv);
+                });
+                
+                timelineContainer.appendChild(ul);
+            }
+
+            document.getElementById('historyModal').style.display = 'flex';
         }
         function formatDateTime(isoString) {
             if (!isoString) return '-';
@@ -729,7 +861,7 @@
             
             tableBodyElement.innerHTML = '';
             if (paginatedItems.length === 0) {
-                tableBodyElement.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #94a3b8; padding: 30px;">Không có dữ liệu.</td></tr>`;
+                tableBodyElement.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #94a3b8; padding: 30px;">Không có dữ liệu.</td></tr>`;
                 paginationContainer.innerHTML = ''; return;
             }
             paginatedItems.forEach((customer, index) => {
@@ -746,6 +878,16 @@
                     <td class="nowrap">${customer.contactName || '-'}</td>
                     <td class="nowrap">${formatPhoneNumber(customer.phone)}</td>
                     <td class="text-right money nowrap" style="color: ${salesColor};">${formatCurrency(customer.sales)}</td>
+                    <td class="text-center nowrap" style="padding: 6px 12px;">
+                        <button type="button" class="history-btn-icon" onclick="event.stopPropagation(); showHistoryModal('${customer.customerId}')" title="Xem lịch sử cập nhật" style="background: transparent; border: 1px solid var(--border-color); border-radius: 4px; padding: 4px 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s; color: var(--text-muted);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
+                              <polyline points="1 4 1 10 7 10" />
+                              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                              <circle cx="12" cy="12" r="5.5" fill="currentColor" stroke="none" />
+                              <path d="M12 9.5v2.5l1.5 1.5" stroke="#ffffff" stroke-width="1.5" />
+                            </svg>
+                        </button>
+                    </td>
                     <td>${customer.notes || '-'}</td>
                 `;
                 tableBodyElement.appendChild(tr);
@@ -843,6 +985,8 @@
         });
 
         document.getElementById('btnCloseNotification').addEventListener('click', function() { notificationModal.style.display = 'none'; });
+        document.getElementById('btnCloseHistoryModal').addEventListener('click', () => { document.getElementById('historyModal').style.display = 'none'; });
+        document.getElementById('btnCloseHistoryBtn').addEventListener('click', () => { document.getElementById('historyModal').style.display = 'none'; });
         document.getElementById('btnConfirmWarning').addEventListener('click', function() { if (pendingActionData) proceedWithSave(pendingActionData.data, pendingActionData.isUpdating); warningModal.style.display = 'none'; pendingActionData = null; });
         document.getElementById('btnCancelWarning').addEventListener('click', function() { warningModal.style.display = 'none'; pendingActionData = null; });
         document.getElementById('btnDelete').addEventListener('click', function() { const id = idInput.value.trim(); customerToDelete = id; deleteModalMessage.innerHTML = `Bạn có chắc chắn muốn xóa khách hàng <strong>"${id}"</strong> không?`; deleteModal.style.display = 'flex'; });
