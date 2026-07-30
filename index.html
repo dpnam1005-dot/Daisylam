@@ -24,184 +24,39 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-    <style>
-        /* CSS Hệ thống - Florenté Warm Natural Aesthetic */
-        :root {
-            --primary-color: #3C4A34; /* Xanh rêu Florenté */
-            --primary-hover: #2D3827;
-            --bg-color: #F8F4EF; /* Nền kem ấm */
-            --card-bg: #FFFFFF;
-            --text-main: #2C2825; /* Chữ nâu đen ấm */
-            --text-muted: #7E766C; /* Chữ nâu xám nhẹ */
-            --border-color: #E6DFD5; /* Viền be ấm */
-            --accent-warm: #C8B29B;
-            --accent-terracotta: #A67B5B;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; line-height: 1.5; }
-        .container { max-width: 1600px; width: 98%; margin: 0 auto; }
-        .header { margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
-        .header h1 { color: var(--primary-color); font-weight: 700; letter-spacing: -0.4px; }
-        .main-content { display: flex; gap: 20px; flex-wrap: wrap; }
-        .form-section { flex: 1; min-width: 300px; max-width: 360px; background: var(--card-bg); padding: 24px; border-radius: 12px; box-shadow: 0 4px 16px rgba(60, 74, 52, 0.04); border: 1px solid var(--border-color); }
-        .table-section { flex: 1; min-width: 600px; background: var(--card-bg); padding: 24px; border-radius: 12px; box-shadow: 0 4px 16px rgba(60, 74, 52, 0.04); border: 1px solid var(--border-color); }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: var(--text-main); }
-        .form-control { width: 100%; padding: 12px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; background: #FDFBF8; color: var(--text-main); line-height: 1.5; transition: all 0.2s ease-in-out; }
-        .form-control:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(60, 74, 52, 0.12); background: #FFFFFF; }
-        .form-row { display: flex; gap: 10px; }
-        .form-row .form-group { flex: 1; }
-        .btn { padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; text-align: center; display: inline-block; width: 100%; transition: all 0.2s ease; }
-        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
-        .btn-primary { background-color: var(--primary-color); color: #F8F4EF; }
-        .btn-primary:hover:not(:disabled) { background-color: var(--primary-hover); transform: translateY(-1px); }
-        .btn-secondary { background-color: #F1ECE4; color: var(--text-main); border: 1px solid var(--border-color); }
-        .btn-secondary:hover:not(:disabled) { background-color: #E5DDD3; }
-        .btn-danger { background-color: #BA4A3A; color: white; }
-        .btn-danger:hover:not(:disabled) { background-color: #9E3C2F; }
-        .btn-export-excel { background-color: #3C4A34; color: #F8F4EF; }
-        .btn-export-excel:hover:not(:disabled) { background-color: #2D3827; }
-        .btn-import-excel { background-color: #8C7A6B; color: white; }
-        .btn-import-excel:hover:not(:disabled) { background-color: #756557; }
-        .btn-export-pdf { background-color: #C49A6C; color: white; }
-        .btn-export-pdf:hover:not(:disabled) { background-color: #AF8557; }
-        .btn-report-month { background-color: #A67B5B; color: white; }
-        .btn-report-month:hover:not(:disabled) { background-color: #8E6547; }
-        .btn-sm { padding: 8px 14px; font-size: 13px; width: auto; border-radius: 6px; }
-        .edit-actions { display: none; gap: 10px; }
-        .table-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-        .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .search-box { padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 8px; width: 250px; background: #FDFBF8; font-size: 14px; }
-        .search-box:focus { outline: none; border-color: var(--primary-color); }
-        .table-container { overflow-x: auto; }
-        table { width: 100%; min-width: 1200px; border-collapse: collapse; }
-        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; vertical-align: middle; }
-        .nowrap { white-space: nowrap; }
-        .col-company { min-width: 200px; }
-        .col-notes { min-width: 150px; }
-        th { background-color: #F5EFE8; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
-        tbody tr:hover { background-color: #F8F3ED; cursor: pointer; }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .money { color: #3C4A34; font-weight: 700; }
-        .pagination-container { display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 5px; }
-        .page-btn { padding: 6px 12px; border: 1px solid var(--border-color); background: white; color: var(--text-main); border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
-        .page-btn:hover:not(.active):not(:disabled) { background: #F5EFE8; }
-        .history-btn-icon:hover { border-color: var(--primary-color) !important; color: var(--primary-color) !important; background-color: #F3ECE2 !important; }
-        .page-btn.active { background: var(--primary-color); color: #F8F4EF; border-color: var(--primary-color); font-weight: 600; }
-        .page-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(44, 40, 37, 0.4); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 24px; border-radius: 12px; width: 400px; max-width: 90%; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .modal-actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
-        .modal-actions .btn { width: auto; }
-        @media (max-width: 768px) { .table-section { min-width: 100%; } }
-        /* CSS Màn hình đăng nhập Florenté Light Mode */
-        .auth-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #F4ECE1;
-            padding: 20px;
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        .auth-card {
-            background: #FFFFFF;
-            border-radius: 16px;
-            padding: 44px 36px;
-            width: 100%;
-            max-width: 440px;
-            box-shadow: 0 12px 32px rgba(60, 74, 52, 0.08), 0 2px 6px rgba(0, 0, 0, 0.02);
-            color: var(--text-main);
-            border: 1px solid #E6DFD5;
-        }
-        .auth-card h2 { text-align: center; margin-bottom: 24px; color: var(--primary-color); font-weight: 700; font-size: 26px; margin-top: 0; letter-spacing: -0.5px; }
-        .auth-card .form-group { margin-bottom: 20px; }
-        .auth-card label { color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 8px; font-size: 14px; text-align: left; }
-        .auth-card .form-control { background: #FDFBF8; color: var(--text-main); border: 1px solid #E2D9CD; width: 100%; padding: 12px 14px; border-radius: 8px; font-size: 15px; transition: all 0.15s ease-in-out; }
-        .auth-card .form-control::placeholder { color: #A49B8E; }
-        .auth-card .form-control:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px rgba(60, 74, 52, 0.15); background: #FFFFFF; }
-        .auth-error-msg { color: #BA4A3A; font-size: 13px; text-align: center; margin-top: 15px; margin-bottom: 5px; display: none; font-weight: 500; }
-        .auth-card .btn-primary { background-color: var(--primary-color); color: #F8F4EF; padding: 12px 15px; border-radius: 8px; font-weight: 600; width: 100%; font-size: 15px; border: none; cursor: pointer; transition: background-color 0.15s ease; margin-top: 10px; }
-        .auth-card .btn-primary:hover { background-color: var(--primary-hover); }
-        .auth-footer-line { border-top: 1px solid #F0E8DC; margin-top: 25px; padding-top: 20px; }
-        .auth-footer-text { text-align: center; font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container" id="mainContainer" style="display: none;">
-        <header class="header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px;">
-            <h1>Doanh số Khách hàng</h1>
-            <button type="button" id="btnLogout" class="btn btn-secondary btn-sm" style="width: auto;">Đăng xuất</button>
+        <header class="main-header">
+            <div class="header-left">
+                <nav class="nav-tabs">
+                    <button type="button" id="tabRanking" class="nav-tab active">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        <span>Bảng Xếp Hạng Doanh Số</span>
+                    </button>
+                    <button type="button" id="tabForm" class="nav-tab" style="display: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        <span id="tabFormText">Thêm / Sửa Khách Hàng</span>
+                    </button>
+                </nav>
+            </div>
+            <div class="header-right">
+                <button type="button" id="btnLogout" class="btn btn-secondary btn-sm" style="width: auto;">Đăng xuất</button>
+            </div>
         </header>
 
-        <div class="main-content">
-            <section class="form-section">
-                <h2 id="formTitle">Thông tin Khách hàng</h2>
-                <br>
-                <form id="customerForm">
-                    <div class="form-group">
-                        <label for="customerId">Mã KH *</label>
-                        <input type="text" id="customerId" class="form-control" required placeholder="Ví dụ: KH001">
-                    </div>
-                    <div class="form-group">
-                        <label for="taxId">Mã số thuế (MST)</label>
-                        <input type="text" id="taxId" class="form-control" placeholder="Nhập MST...">
-                    </div>
-                    <div class="form-group">
-                        <label for="companyName">Tên Công ty</label>
-                        <input type="text" id="companyName" class="form-control" placeholder="Tên công ty...">
-                    </div>
-                    <div class="form-group">
-                        <label for="classification">Phân loại khách hàng</label>
-                        <select id="classification" class="form-control">
-                            <option value="">-- Chưa phân loại --</option>
-                            <option value="Khách mới">Khách mới (Xanh dương)</option>
-                            <option value="Thường xuyên">Thường xuyên (Vàng)</option>
-                            <option value="Không thường xuyên">Không thường xuyên (Hồng)</option>
-                            <option value="Chưa liên hệ được">Chưa liên hệ được (Xanh lá)</option>
-                            <option value="Không nhu cầu">Không nhu cầu (Đỏ)</option>
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="contactName">Người liên hệ</label>
-                            <input type="text" id="contactName" class="form-control" placeholder="Tên người LH...">
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Số điện thoại</label>
-                            <input type="tel" id="phone" class="form-control" placeholder="SĐT...">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label id="salesLabel" for="sales">Doanh số KH (VNĐ)</label>
-                            <input type="text" id="sales" class="form-control" placeholder="0">
-                        </div>
-                        <div class="form-group" id="addSalesContainer" style="display: none;">
-                            <label for="addSales">Cập nhật DS (+/-)</label>
-                            <input type="text" id="addSales" class="form-control" placeholder="0">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="notes">Ghi chú</label>
-                        <textarea id="notes" class="form-control" rows="3" placeholder="Thêm ghi chú..."></textarea>
-                    </div>
-
-                    <button type="submit" id="btnSubmit" class="btn btn-primary">Lưu Thông Tin</button>
-                    
-                    <div id="editActions" class="edit-actions">
-                        <button type="button" id="btnUpdate" class="btn btn-primary">Cập nhật</button>
-                        <button type="button" id="btnDelete" class="btn btn-danger" title="Xóa khách hàng này">Xóa</button>
-                        <button type="button" id="btnCancelEdit" class="btn btn-secondary">Hủy</button>
-                    </div>
-                </form>
-            </section>
-
-            <section class="table-section">
+        <!-- TRANG CHÍNH: BẢNG XẾP HẠNG DOANH SỐ -->
+        <div id="pageRanking" class="app-page">
+            <section class="table-section" style="min-width: 100%;">
                 <div class="table-header-flex">
                     <h2>Bảng Xếp hạng Doanh số</h2>
                     <div class="header-actions">
+                        <button type="button" id="btnAddNewCustomer" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; background-color: #1B362B; border-color: #1B362B;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <span>Thêm Khách Hàng Mới</span>
+                        </button>
+                        <span style="border-left: 1px solid #cbd5e1; height: 24px; margin: 0 4px;"></span>
                         <input type="text" id="searchInput" class="search-box" placeholder="Tìm kiếm khách hàng...">
                         
                         <input type="file" id="fileInputExcel" accept=".xlsx, .xls, .csv" style="display: none;">
@@ -237,12 +92,11 @@
                                 <th class="nowrap">Người liên hệ</th>
                                 <th class="nowrap">SĐT</th>
                                 <th class="text-right nowrap">Doanh số KH</th>
-                                <th class="nowrap text-center">Lịch sử</th>
                                 <th class="col-notes">Ghi chú</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                            <tr><td colspan="9" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang kết nối và tải dữ liệu từ máy chủ...</td></tr>
+                            <tr><td colspan="8" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang kết nối và tải dữ liệu từ máy chủ...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -250,6 +104,250 @@
                 <div id="pagination" class="pagination-container"></div>
             </section>
         </div>
+    </div>
+
+    <!-- Modal Option 1: Chỉnh sửa thông tin khách hàng (Khớp 100% giao diện hình mẫu mới) -->
+    <div id="editCustomerInfoModal" class="modal-overlay">
+        <div class="modal-content customer-form-modal">
+            <div class="modal-header-custom">
+                <h3 class="modal-title-custom">
+                    <span>📝</span> <span>Chỉnh Sửa Thông Tin Khách Hàng</span>
+                </h3>
+                <span id="btnCloseEditInfoModal" class="modal-close-custom">&times;</span>
+            </div>
+            
+            <form id="editCustomerInfoForm">
+                <!-- Row 1: Mã KH * (Readonly) & MST -->
+                <div class="form-row">
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="editCustomerId">Mã KH *</label>
+                        <input type="text" id="editCustomerId" class="form-control-custom" readonly style="background: #F1F5F9; color: #334155; font-weight: 600; cursor: not-allowed;">
+                    </div>
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="editTaxId">Mã số thuế (MST)</label>
+                        <input type="text" id="editTaxId" class="form-control-custom" placeholder="Nhập MST...">
+                    </div>
+                </div>
+
+                <!-- Row 2: Tên Công ty & Phân loại -->
+                <div class="form-row">
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="editCompanyName">Tên Công ty</label>
+                        <input type="text" id="editCompanyName" class="form-control-custom" placeholder="Tên công ty...">
+                    </div>
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="editClassification">Phân loại khách hàng</label>
+                        <select id="editClassification" class="form-control-custom">
+                            <option value="">-- Chưa phân loại --</option>
+                            <option value="Khách mới">Khách mới (Xanh dương)</option>
+                            <option value="Thường xuyên">Thường xuyên (Vàng)</option>
+                            <option value="Không thường xuyên">Không thường xuyên (Hồng)</option>
+                            <option value="Chưa liên hệ được">Chưa liên hệ được (Xanh lá)</option>
+                            <option value="Không nhu cầu">Không nhu cầu (Đỏ)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 3: Tên sản phẩm & Mô tả sản phẩm -->
+                <div class="form-row">
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="editCategory">Tên sản phẩm</label>
+                        <input type="text" id="editCategory" class="form-control-custom" list="editCategoryDatalist" placeholder="Nhập hoặc chọn tên sản phẩm...">
+                        <datalist id="editCategoryDatalist">
+                            <option value="Máy in">
+                            <option value="Mực in">
+                            <option value="Linh kiện">
+                            <option value="Dịch vụ / Sửa chữa">
+                            <option value="Khác">
+                        </datalist>
+                    </div>
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="editProductDesc">Mô tả sản phẩm</label>
+                        <input type="text" id="editProductDesc" class="form-control-custom" list="editProductDescDatalist" placeholder="Nhập hoặc chọn mô tả (ví dụ: HP M404dn)...">
+                        <datalist id="editProductDescDatalist"></datalist>
+                    </div>
+                </div>
+
+                <!-- Row 4: Người liên hệ & SĐT -->
+                <div class="form-row">
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="editContactName">Người liên hệ</label>
+                        <input type="text" id="editContactName" class="form-control-custom" placeholder="Tên người LH...">
+                    </div>
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="editPhone">Số điện thoại</label>
+                        <input type="tel" id="editPhone" class="form-control-custom" placeholder="SĐT...">
+                    </div>
+                </div>
+
+                <!-- Row 5: Doanh số hiện tại (VNĐ) (Readonly) -->
+                <div class="form-group-custom form-group">
+                    <label for="editSalesDisplay">Doanh số hiện tại (VNĐ)</label>
+                    <input type="text" id="editSalesDisplay" class="form-control-custom" readonly style="background: #F1F5F9; color: #1E293B; font-weight: 600; cursor: not-allowed;">
+                </div>
+
+                <!-- Row 6: Ghi chú -->
+                <div class="form-group-custom form-group">
+                    <label for="editNotes">Ghi chú</label>
+                    <textarea id="editNotes" class="form-control-custom" rows="3" placeholder="Thêm ghi chú..."></textarea>
+                </div>
+
+                <!-- Footer nút bấm: Cập nhật Hồ sơ | Xóa | Hủy (Xếp hàng ngang bên phải) -->
+                <div style="margin-top: 24px; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
+                    <button type="submit" id="btnSaveEditInfo" class="btn-submit-custom" style="width: auto; padding: 10px 20px; background-color: #1B362B; border-radius: 8px;">Cập nhật Hồ sơ</button>
+                    <button type="button" id="btnDeleteCustomer" class="btn btn-danger" style="width: auto; border-radius: 8px; font-weight: 700; padding: 10px 20px; background-color: #C85A4B;">Xóa</button>
+                    <button type="button" id="btnCancelEditInfo" class="btn-cancel-sales" style="border-radius: 8px; padding: 10px 20px;">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Option 2: Cập Nhật Doanh Số & Sản Phẩm (Đúng chuẩn theo hình ảnh mẫu) -->
+    <div id="updateSalesModal" class="modal-overlay">
+        <div class="modal-content update-sales-modal">
+            <div class="update-sales-header">
+                <div>
+                    <h3 class="update-sales-title">
+                        <span>💰</span> <span>Cập Nhật Doanh Số & Sản Phẩm</span>
+                    </h3>
+                    <div id="updateSalesSubtitle" class="update-sales-subtitle"></div>
+                </div>
+                <span id="btnCloseUpdateSalesModal" class="modal-close-custom">&times;</span>
+            </div>
+            
+            <form id="updateSalesForm">
+                <div class="form-group-custom form-group">
+                    <label for="salesAmountInput">Cập nhật doanh số phát sinh (VNĐ) *</label>
+                    <input type="text" id="salesAmountInput" class="form-control-custom" required placeholder="Ví dụ: 5,000,000 (Dùng dấu – nếu giảm)">
+                </div>
+
+                <div class="form-group-custom form-group">
+                    <label for="salesCategorySelect">Tên sản phẩm</label>
+                    <input type="text" id="salesCategorySelect" class="form-control-custom" list="salesCategoryDatalist" placeholder="Nhập hoặc chọn tên sản phẩm...">
+                    <datalist id="salesCategoryDatalist">
+                        <option value="Máy in">
+                        <option value="Mực in">
+                        <option value="Linh kiện">
+                        <option value="Dịch vụ / Sửa chữa">
+                        <option value="Khác">
+                    </datalist>
+                </div>
+
+                <div class="form-group-custom form-group">
+                    <label for="salesProductDescInput">Mô tả sản phẩm</label>
+                    <input type="text" id="salesProductDescInput" class="form-control-custom" list="salesProductDescDatalist" placeholder="Nhập hoặc chọn mô tả (ví dụ: HP M404dn, RAM 16GB)...">
+                    <datalist id="salesProductDescDatalist"></datalist>
+                </div>
+
+                <div class="form-group-custom form-group">
+                    <label for="salesTxNoteInput">Ghi chú giao dịch đợt này</label>
+                    <textarea id="salesTxNoteInput" class="form-control-custom" rows="3" placeholder="Ghi chú đợt phát sinh doanh số này (không bắt buộc)..."></textarea>
+                </div>
+
+                <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="submit" id="btnSaveUpdateSales" class="btn-save-sales">Lưu Doanh Số & Sản Phẩm</button>
+                    <button type="button" id="btnCancelUpdateSales" class="btn-cancel-sales">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Form Thêm Khách Hàng Mới -->
+    <div id="customerFormModal" class="modal-overlay">
+        <div class="modal-content customer-form-modal">
+            <div class="modal-header-custom">
+                <h3 id="formModalTitle" class="modal-title-custom">
+                    <span id="formModalIcon">➕</span> <span id="formModalTitleText">Thêm Khách Hàng Mới</span>
+                </h3>
+                <span id="btnCloseCustomerFormModal" class="modal-close-custom">&times;</span>
+            </div>
+            
+            <form id="customerForm">
+                <!-- Row 1: Mã KH & MST -->
+                <div class="form-row">
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="customerId">Mã KH *</label>
+                        <input type="text" id="customerId" class="form-control-custom" required placeholder="Ví dụ: KH001">
+                        <div id="customerIdError" style="color: #ef4444; font-size: 12px; margin-top: 4px; display: none; font-weight: 600;">⚠️ Mã khách hàng này đã tồn tại!</div>
+                    </div>
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="taxId">Mã số thuế (MST)</label>
+                        <input type="text" id="taxId" class="form-control-custom" placeholder="Nhập MST...">
+                    </div>
+                </div>
+
+                <!-- Row 2: Tên Công ty & Phân loại -->
+                <div class="form-row">
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="companyName">Tên Công ty</label>
+                        <input type="text" id="companyName" class="form-control-custom" placeholder="Tên công ty...">
+                    </div>
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="classification">Phân loại khách hàng</label>
+                        <select id="classification" class="form-control-custom">
+                            <option value="">-- Chưa phân loại --</option>
+                            <option value="Khách mới">Khách mới (Xanh dương)</option>
+                            <option value="Thường xuyên">Thường xuyên (Vàng)</option>
+                            <option value="Không thường xuyên">Không thường xuyên (Hồng)</option>
+                            <option value="Chưa liên hệ được">Chưa liên hệ được (Xanh lá)</option>
+                            <option value="Không nhu cầu">Không nhu cầu (Đỏ)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 3: Tên sản phẩm & Mô tả sản phẩm -->
+                <div class="form-row">
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="category">Tên sản phẩm</label>
+                        <input type="text" id="category" class="form-control-custom" list="categoryDatalist" placeholder="Nhập hoặc chọn tên sản phẩm...">
+                        <datalist id="categoryDatalist">
+                            <option value="Máy in">
+                            <option value="Mực in">
+                            <option value="Linh kiện">
+                            <option value="Dịch vụ / Sửa chữa">
+                            <option value="Khác">
+                        </datalist>
+                    </div>
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="productDesc">Mô tả sản phẩm</label>
+                        <input type="text" id="productDesc" class="form-control-custom" list="productDescDatalist" placeholder="Nhập hoặc chọn mô tả (ví dụ: HP M404dn)...">
+                        <datalist id="productDescDatalist"></datalist>
+                    </div>
+                </div>
+
+                <!-- Row 4: Người liên hệ & SĐT -->
+                <div class="form-row">
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="contactName">Người liên hệ</label>
+                        <input type="text" id="contactName" class="form-control-custom" placeholder="Tên người LH...">
+                    </div>
+                    <div class="form-group-custom form-group" style="flex: 1;">
+                        <label for="phone">Số điện thoại</label>
+                        <input type="tel" id="phone" class="form-control-custom" placeholder="SĐT...">
+                    </div>
+                </div>
+
+                <!-- Row 5: Doanh số -->
+                <div class="form-row">
+                    <div class="form-group-custom form-group" id="salesContainer" style="flex: 1;">
+                        <label id="salesLabel" for="sales">Doanh số ban đầu (VNĐ)</label>
+                        <input type="text" id="sales" class="form-control-custom" placeholder="0">
+                    </div>
+                </div>
+
+                <!-- Row 6: Ghi chú -->
+                <div class="form-group-custom form-group">
+                    <label for="notes">Ghi chú</label>
+                    <textarea id="notes" class="form-control-custom" rows="3" placeholder="Thêm ghi chú..."></textarea>
+                </div>
+
+                <!-- Nút bấm submit -->
+                <div style="margin-top: 20px;">
+                    <button type="submit" id="btnSubmit" class="btn-submit-custom">Lưu Khách Hàng</button>
+                </div>
+            </form>
+        </div>
+    </div>
     </div>
 
     <div id="authContainer" class="auth-container">
@@ -298,11 +396,18 @@
                 <strong id="reportTotalRevenue" style="color: #10b981; font-size: 18px;">0 VNĐ</strong>
             </div>
             <div class="modal-actions" style="justify-content: space-between; display: flex; width: 100%;">
-                <button type="button" id="btnAnalyzeCustomers" class="btn btn-primary" style="width: auto; background-color: #3b82f6; display: inline-flex; align-items: center; gap: 8px;">
+                <button type="button" id="btnAnalyzeCustomers" class="btn btn-primary" style="flex: 1; max-width: 280px; background-color: var(--primary-color); display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bar-chart-line" viewBox="0 0 16 16">
                       <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-3 0v-3H2v3h2z"/>
                     </svg>
                     <span>Phân tích Khách hàng</span>
+                </button>
+                <button type="button" id="btnAnalyzeProducts" class="btn btn-primary" style="flex: 1; max-width: 280px; background-color: var(--accent-terracotta); display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                      <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319z"/>
+                    </svg>
+                    <span>Phân tích Sản phẩm</span>
                 </button>
                 <button type="button" id="btnCloseReport" class="btn btn-secondary" style="width: auto; min-width: 100px;">Đóng</button>
             </div>
@@ -411,7 +516,16 @@
                     </svg>
                     <span id="analysisTitle">Phân Tích Doanh Thu & Khách Hàng</span>
                 </h3>
-                <span id="btnCloseAnalysisModal" style="cursor: pointer; font-size: 24px; color: var(--text-muted); font-weight: bold; line-height: 1;">&times;</span>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" id="btnExportAnalysisPDF" style="background: var(--primary-color); color: white; border: none; border-radius: 6px; padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; transition: all 0.2s;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                          <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+                        </svg>
+                        <span>In PDF</span>
+                    </button>
+                    <span id="btnCloseAnalysisModal" style="cursor: pointer; font-size: 24px; color: var(--text-muted); font-weight: bold; line-height: 1;">&times;</span>
+                </div>
             </div>
             
             <div style="overflow-y: auto; flex: 1; padding-right: 5px;">
@@ -510,1303 +624,166 @@
         </div>
     </div>
 
-    <script>
-        // Bắt lỗi toàn hệ thống và hiển thị trực tiếp lên giao diện để dễ debug
-        window.onerror = function (message, source, lineno, colno, error) {
-            console.error("Lỗi hệ thống:", message, source, lineno, colno, error);
-            const authErrorMsg = document.getElementById('authErrorMsg');
-            const authContainer = document.getElementById('authContainer');
-            if (authErrorMsg && authContainer && authContainer.style.display !== 'none') {
-                authErrorMsg.innerHTML = `<span style="color: #ef4444; font-weight: bold;">Lỗi hệ thống (JS):</span> ${message}<br><small style="color: var(--text-muted); font-size: 11px;">Tại: ${source ? source.split('/').pop() : 'unknown'}:${lineno}</small>`;
-                authErrorMsg.style.display = 'block';
-                const btnSubmit = document.getElementById('btnAuthSubmit');
-                if (btnSubmit) {
-                    btnSubmit.innerText = 'Đăng nhập';
-                    btnSubmit.disabled = false;
-                }
-            } else {
-                alert("Lỗi hệ thống (JS Error):\n" + message + "\n\nTại: " + (source ? source.split('/').pop() : 'unknown') + " (Dòng " + lineno + ")");
-                const tableBody = document.getElementById('tableBody');
-                if (tableBody) {
-                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
-                        <b>Lỗi hệ thống (JavaScript Error):</b> ${message}<br>
-                        <small style="color: var(--text-muted);">Tại: ${source ? source.split('/').pop() : 'unknown'}:${lineno}:${colno}</small>
-                    </td></tr>`;
-                }
-            }
-            return false;
-        };
-
-        // ========== CONFIG ==========
-        const SB_URL = 'https://ozpaslchfhcdechmrhlv.supabase.co';
-        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96cGFzbGNoZmhjZGVjaG1yaGx2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxMTQxMDUsImV4cCI6MjA5ODY5MDEwNX0.Ekzyal8ona_CjoBkHV19iaDm20DXqCV4MJanSseZ1lo';
-        
-        let supabaseClient;
-        try {
-            if (!window.supabase) {
-                throw new Error("Không thể tải thư viện Supabase từ CDN (jsDelivr / UNPKG). Vui lòng kiểm tra lại kết nối Internet.");
-            }
-            supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
-        } catch (e) {
-            console.error(e);
-            document.addEventListener("DOMContentLoaded", () => {
-                const tableBody = document.getElementById('tableBody');
-                if (tableBody) {
-                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
-                        <b>Lỗi khởi tạo ứng dụng:</b> ${e.message}<br>
-                        <span style="color: var(--text-muted); font-size: 13px;">Vui lòng thử đổi DNS hoặc bật VPN, rồi tải lại trang (F5).</span>
-                    </td></tr>`;
-                }
-            });
-        }
-
-        let customers = [];
-        let currentUserEmail = null;
-        let isEditing = false;
-        let pendingCustomerData = null;
-        let pendingActionData = null;
-        let pendingNotification = null;
-        let currentPage = 1;
-        const itemsPerPage = 10;
-
-        // Elements cho chức năng Đăng nhập / Đăng xuất
-        const authContainer = document.getElementById('authContainer');
-        const mainContainer = document.getElementById('mainContainer');
-        const authForm = document.getElementById('authForm');
-        const authId = document.getElementById('authId');
-        const authPassword = document.getElementById('authPassword');
-        const authErrorMsg = document.getElementById('authErrorMsg');
-        const btnLogout = document.getElementById('btnLogout');
-
-        // Xử lý gửi form Đăng nhập bằng Supabase Authentication
-        if (authForm) {
-            authForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const id = authId.value.trim();
-                const password = authPassword.value;
-                const btnSubmit = document.getElementById('btnAuthSubmit');
-                
-                btnSubmit.innerText = 'Đang đăng nhập...';
-                btnSubmit.disabled = true;
-                authErrorMsg.style.display = 'none';
-
-                try {
-                    if (!supabaseClient) {
-                        throw new Error("Không có kết nối đến cơ sở dữ liệu Supabase.");
-                    }
-                    
-                    // Tự động map ID thành định dạng Email cho Supabase Auth (ví dụ: hieuhanh -> hieuhanh@daisylam.id.vn)
-                    const email = id.includes('@') ? id : `${id}@daisylam.id.vn`;
-                    
-                    const { data, error } = await supabaseClient.auth.signInWithPassword({
-                        email: email,
-                        password: password
-                    });
-
-                    if (error) throw error;
-                    
-                    // Khi đăng nhập thành công, onAuthStateChange sẽ tự động cập nhật UI
-                } catch (err) {
-                    console.error("Lỗi đăng nhập:", err);
-                    authErrorMsg.innerText = err.message || "Tên đăng nhập hoặc mật khẩu không chính xác.";
-                    authErrorMsg.style.display = 'block';
-                    btnSubmit.innerText = 'Đăng nhập';
-                    btnSubmit.disabled = false;
-                }
-            });
-        }
-
-        // Xử lý nút Đăng xuất bằng Supabase Auth
-        if (btnLogout) {
-            btnLogout.addEventListener('click', async function() {
-                if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?")) {
-                    try {
-                        if (supabaseClient) {
-                            await supabaseClient.auth.signOut();
-                        }
-                    } catch (err) {
-                        console.error("Lỗi đăng xuất:", err);
-                    }
-                }
-            });
-        }
-
-        // Lắng nghe và quản lý trạng thái Đăng nhập tự động bằng Supabase Auth
-        function initAuthListener() {
-            if (supabaseClient) {
-                supabaseClient.auth.onAuthStateChange((event, session) => {
-                    console.log("Sự kiện Auth:", event, session);
-                    if (session) {
-                        // Đã đăng nhập thành công
-                        currentUserEmail = session.user?.email || null;
-                        if (authContainer) authContainer.style.display = 'none';
-                        if (mainContainer) mainContainer.style.display = 'block';
-                        if (btnLogout) btnLogout.style.display = 'block';
-                        
-                        // Tải dữ liệu khách hàng
-                        fetchCustomers();
-                    } else {
-                        // Chưa đăng nhập / Đăng xuất
-                        currentUserEmail = null;
-                        if (authContainer) authContainer.style.display = 'flex';
-                        if (mainContainer) mainContainer.style.display = 'none';
-                        if (btnLogout) btnLogout.style.display = 'none';
-                        
-                        // Reset biểu mẫu đăng nhập
-                        if (authForm) authForm.reset();
-                        const btnSubmit = document.getElementById('btnAuthSubmit');
-                        if (btnSubmit) {
-                            btnSubmit.innerText = 'Đăng nhập';
-                            btnSubmit.disabled = false;
-                        }
-                    }
-                });
-            } else {
-                if (authContainer) authContainer.style.display = 'flex';
-                if (mainContainer) mainContainer.style.display = 'none';
-            }
-        }
-
-
-        function mapFromSupabase(row) {
-            let parsedHistory = [];
-            if (typeof row.history === 'string') {
-                try {
-                    parsedHistory = JSON.parse(row.history);
-                } catch {
-                    parsedHistory = [];
-                }
-            } else if (Array.isArray(row.history)) {
-                parsedHistory = row.history;
-            }
-            return {
-                customerId: row.customer_id || '',
-                taxId: row.tax_id || '',
-                companyName: row.company_name || '',
-                classification: row.classification || '',
-                contactName: row.contact_name || '',
-                phone: row.phone || '',
-                sales: Number(row.sales) || 0,
-                notes: row.notes || '',
-                lastUpdated: row.updated_at || '',
-                updatedBy: row.updated_by || '',
-                history: parsedHistory
-            };
-        }
-
-        function mapToSupabase(c) {
-            const taxVal = c.taxId?.toString().trim();
-            const phoneVal = c.phone?.toString().trim();
-            const salesVal = c.sales?.toString().trim();
-
-            let formattedPhone = phoneVal || null;
-            if (phoneVal && /^\d+$/.test(phoneVal) && !phoneVal.startsWith('0') && !phoneVal.startsWith('+')) {
-                formattedPhone = '0' + phoneVal;
-            }
-
-            return {
-                customer_id: c.customerId?.trim() || '',
-                tax_id: taxVal || null,
-                company_name: c.companyName?.trim() || '',
-                classification: c.classification || '',
-                contact_name: c.contactName?.trim() || '',
-                phone: formattedPhone,
-                sales: salesVal && !isNaN(Number(salesVal)) ? Number(salesVal) : null,
-                notes: c.notes?.trim() || null,
-                updated_at: c.lastUpdated || new Date().toISOString(),
-                updated_by: currentUserEmail ? currentUserEmail.split('@')[0] : 'hệ thống',
-                history: Array.isArray(c.history) ? c.history : []
-            };
-        }
-
-        async function fetchCustomers() {
-            const tableBody = document.getElementById('tableBody');
-            try {
-                tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang tải dữ liệu từ máy chủ Supabase...</td></tr>`;
-                
-                if (!supabaseClient) {
-                    throw new Error("Kết nối Supabase chưa được thiết lập. Hãy kiểm tra lỗi khởi tạo ở trên.");
-                }
-                
-                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Quá thời gian 10 giây. Hãy kiểm tra lại kết nối mạng!")), 10000));
-                const fetchPromise = supabaseClient.from('Quan ly ban hang').select('*').order('sales', { ascending: false });
-                
-                const { data, error } = await Promise.race([fetchPromise, timeout]);
-                
-                if (error) {
-                    console.error("Lỗi từ Supabase:", error);
-                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
-                        <b>Lỗi máy chủ:</b> ${error.message} <br>
-                    </td></tr>`;
-                    return;
-                }
-                
-                customers = (data || []).map(mapFromSupabase);
-                renderTable();
-            } catch(e) {
-                console.error("Lỗi hệ thống:", e);
-                tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
-                    <b>Lỗi kết nối mạng:</b> ${e.message}
-                </td></tr>`;
-            }
-        }
-
-        const form = document.getElementById('customerForm');
-        const searchInput = document.getElementById('searchInput');
-        const tableBodyElement = document.getElementById('tableBody');
-        const paginationContainer = document.getElementById('pagination');
-        const filterClassification = document.getElementById('filterClassification');
-        
-        const modal = document.getElementById('duplicateModal');
-        const modalMessage = document.getElementById('modalMessage');
-        const deleteModal = document.getElementById('deleteModal');
-        const deleteModalMessage = document.getElementById('deleteModalMessage');
-        const warningModal = document.getElementById('warningModal');
-        const warningModalMessage = document.getElementById('warningModalMessage');
-        const notificationModal = document.getElementById('notificationModal');
-        const notificationTitle = document.getElementById('notificationTitle');
-        const notificationMessage = document.getElementById('notificationMessage');
-
-        const idInput = document.getElementById('customerId');
-        const taxIdInput = document.getElementById('taxId');
-        const companyInput = document.getElementById('companyName');
-        const classificationInput = document.getElementById('classification');
-        const contactInput = document.getElementById('contactName');
-        const phoneInput = document.getElementById('phone');
-        
-        const salesLabel = document.getElementById('salesLabel');
-        const salesInput = document.getElementById('sales');
-        const addSalesContainer = document.getElementById('addSalesContainer');
-        const addSalesInput = document.getElementById('addSales');
-        const notesInput = document.getElementById('notes');
-
-        const btnSubmit = document.getElementById('btnSubmit');
-        const editActions = document.getElementById('editActions');
-        const btnCancelEdit = document.getElementById('btnCancelEdit');
-        const btnUpdate = document.getElementById('btnUpdate');
-        const btnDelete = document.getElementById('btnDelete');
-        
-        const fileInputExcel = document.getElementById('fileInputExcel');
-        let customerToDelete = null;
-
-        function formatInputWithCommas(e) {
-            let isNegative = this.value.startsWith('-');
-            let rawValue = this.value.replace(/\D/g, ''); 
-            let formatted = rawValue ? parseInt(rawValue, 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '';
-            if (isNegative && formatted) this.value = '-' + formatted;
-            else if (isNegative && !formatted) this.value = '-'; 
-            else this.value = formatted;
-
-            if (this.id === 'addSales') {
-                if (isNegative && formatted) { this.style.borderColor = '#ef4444'; this.style.color = '#ef4444'; }
-                else if (!isNegative && formatted) { this.style.borderColor = '#10b981'; this.style.color = '#10b981'; }
-                else { this.style.borderColor = 'var(--border-color)'; this.style.color = 'var(--text-main)'; }
-            }
-        }
-        
-        salesInput.addEventListener('input', formatInputWithCommas);
-        addSalesInput.addEventListener('input', formatInputWithCommas);
-
-        function formatCurrency(amount) { return Number(amount).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }); }
-        function formatPhoneNumber(phoneVal) {
-            if (!phoneVal) return '-';
-            let str = phoneVal.toString().trim();
-            if (!str || str === '-') return '-';
-            // Nếu là số thuần túy và không bắt đầu bằng '0' hoặc '+', tự động thêm '0' ở đầu
-            if (/^\d+$/.test(str) && !str.startsWith('0') && !str.startsWith('+')) {
-                return '0' + str;
-            }
-            return str;
-        }
-
-        function showHistoryModal(customerId) {
-            const customer = customers.find(c => c.customerId === customerId);
-            if (!customer) return;
-
-            const metaContainer = document.getElementById('historyModalMeta');
-            metaContainer.innerHTML = `
-                <strong>Mã khách hàng:</strong> ${customer.customerId} <br>
-                <strong>Tên Công ty:</strong> ${customer.companyName || '-'}
-            `;
-
-            const timelineContainer = document.getElementById('historyTimelineContainer');
-            timelineContainer.innerHTML = '';
-
-            const history = customer.history || [];
-            if (history.length === 0) {
-                timelineContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">Chưa có lịch sử cập nhật cho khách hàng này.</div>`;
-            } else {
-                // Sắp xếp lịch sử theo thời gian mới nhất lên đầu
-                const sortedHistory = [...history].sort((a, b) => new Date(b.date) - new Date(a.date));
-                
-                const ul = document.createElement('div');
-                ul.style.position = 'relative';
-                ul.style.paddingLeft = '24px';
-                ul.style.borderLeft = '2px solid #e2e8f0';
-                ul.style.marginLeft = '12px';
-                ul.style.display = 'flex';
-                ul.style.flexDirection = 'column';
-                ul.style.gap = '20px';
-
-                sortedHistory.forEach(item => {
-                    const itemDate = new Date(item.date);
-                    const formattedDate = itemDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                    const formattedTime = itemDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-                    const user = item.updated_by || 'hệ thống';
-
-                    const itemDiv = document.createElement('div');
-                    itemDiv.style.position = 'relative';
-                    
-                    // Dot
-                    const dot = document.createElement('div');
-                    dot.style.position = 'absolute';
-                    dot.style.left = '-31px';
-                    dot.style.top = '4px';
-                    dot.style.width = '12px';
-                    dot.style.height = '12px';
-                    dot.style.borderRadius = '50%';
-                    dot.style.backgroundColor = 'var(--primary-color)';
-                    dot.style.border = '2px solid white';
-                    itemDiv.appendChild(dot);
-
-                    // Content card
-                    const content = document.createElement('div');
-                    content.style.fontSize = '14px';
-                    content.style.lineHeight = '1.6';
-
-                    // Time header
-                    const timeHeader = document.createElement('div');
-                    timeHeader.style.fontSize = '12px';
-                    timeHeader.style.color = 'var(--text-muted)';
-                    timeHeader.style.fontWeight = 'bold';
-                    timeHeader.innerText = `${formattedDate} LÚC ${formattedTime}`;
-                    content.appendChild(timeHeader);
-
-                    // Action title
-                    const actionTitle = document.createElement('div');
-                    actionTitle.style.fontWeight = 'bold';
-                    actionTitle.style.color = 'var(--text-main)';
-                    actionTitle.style.marginTop = '2px';
-                    actionTitle.innerText = item.note || 'Cập nhật thông tin';
-                    content.appendChild(actionTitle);
-
-                    // Details box
-                    const detailsBox = document.createElement('div');
-                    detailsBox.style.background = '#f8fafc';
-                    detailsBox.style.border = '1px solid #e2e8f0';
-                    detailsBox.style.borderRadius = '6px';
-                    detailsBox.style.padding = '8px 12px';
-                    detailsBox.style.marginTop = '6px';
-                    
-                    let detailsHtml = `<ul style="margin: 0; padding-left: 15px; list-style-type: disc; color: #475569; font-size: 13px;">`;
-                    detailsHtml += `<li>Thực hiện bởi: <strong>${user}</strong></li>`;
-                    if (item.amount !== undefined && item.amount !== null && item.amount !== 0) {
-                        const amountPrefix = item.amount > 0 ? '+' : '';
-                        detailsHtml += `<li>Biến động doanh số: <strong style="color: ${item.amount > 0 ? '#10b981' : '#ef4444'}">${amountPrefix}${formatCurrency(item.amount)}</strong></li>`;
-                    }
-                    detailsHtml += `</ul>`;
-                    
-                    detailsBox.innerHTML = detailsHtml;
-                    content.appendChild(detailsBox);
-
-                    itemDiv.appendChild(content);
-                    ul.appendChild(itemDiv);
-                });
-                
-                timelineContainer.appendChild(ul);
-            }
-
-            document.getElementById('historyModal').style.display = 'flex';
-        }
-        function formatDateTime(isoString) {
-            if (!isoString) return '-';
-            const d = new Date(isoString);
-            return d.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-        }
-
-        const classificationColors = {
-            "Khách mới": "#3b82f6", "Thường xuyên": "#D4AF37", "Không thường xuyên": "#FC5A8D",
-            "Chưa liên hệ được": "#10b981", "Không nhu cầu": "#ef4444"
-        };
-
-        function getFormData() {
-            let parsedSales = Number(salesInput.value.replace(/[,.]/g, ''));
-            if (isNaN(parsedSales)) parsedSales = 0;
-            return {
-                customerId: idInput ? idInput.value.trim() : '', taxId: taxIdInput ? taxIdInput.value.trim() : '',
-                companyName: companyInput ? companyInput.value.trim() : '', classification: classificationInput ? classificationInput.value : '',
-                contactName: contactInput ? contactInput.value.trim() : '', phone: phoneInput ? phoneInput.value.trim() : '',
-                sales: parsedSales, notes: notesInput ? notesInput.value.trim() : ''
-            };
-        }
-
-        function setFormData(data) {
-            if (idInput) idInput.value = data.customerId || ''; if (taxIdInput) taxIdInput.value = data.taxId || '';
-            if (companyInput) companyInput.value = data.companyName || ''; if (classificationInput) classificationInput.value = data.classification || '';
-            if (contactInput) contactInput.value = data.contactName || ''; if (phoneInput) phoneInput.value = data.phone ? formatPhoneNumber(data.phone) : '';
-            if (salesInput) salesInput.value = data.sales || data.sales === 0 ? data.sales.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '';
-            if (notesInput) notesInput.value = data.notes || '';
-            if (addSalesInput) { addSalesInput.value = ''; addSalesInput.style.borderColor = 'var(--border-color)'; addSalesInput.style.color = 'var(--text-main)'; }
-        }
-
-        function toggleEditMode(editing) {
-            isEditing = editing;
-            if (editing) {
-                document.getElementById('formTitle').innerText = "Chỉnh sửa Khách hàng";
-                btnSubmit.style.display = 'none'; editActions.style.display = 'flex';
-                idInput.readOnly = true; idInput.style.backgroundColor = '#f1f5f9';
-                salesInput.readOnly = true; salesInput.style.backgroundColor = '#f1f5f9';
-                addSalesContainer.style.display = 'block'; salesLabel.innerText = "Doanh số gốc (VNĐ)";
-            } else {
-                document.getElementById('formTitle').innerText = "Thông tin Khách hàng";
-                btnSubmit.style.display = 'block'; editActions.style.display = 'none';
-                idInput.readOnly = false; idInput.style.backgroundColor = '#fff';
-                salesInput.readOnly = false; salesInput.style.backgroundColor = '#fff';
-                setFormData({});
-                addSalesContainer.style.display = 'none'; salesLabel.innerText = "Doanh số KH (VNĐ)";
-            }
-        }
-
-        function renderPagination(totalItems) {
-            paginationContainer.innerHTML = '';
-            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
-            if (totalPages <= 1) return;
-            const prevBtn = document.createElement('button');
-            prevBtn.className = 'page-btn'; prevBtn.innerText = 'Trước'; prevBtn.disabled = currentPage === 1;
-            prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; renderTable(); } };
-            paginationContainer.appendChild(prevBtn);
-            for (let i = 1; i <= totalPages; i++) {
-                const pageBtn = document.createElement('button');
-                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`; pageBtn.innerText = i;
-                pageBtn.onclick = () => { currentPage = i; renderTable(); }; paginationContainer.appendChild(pageBtn);
-            }
-            const nextBtn = document.createElement('button');
-            nextBtn.className = 'page-btn'; nextBtn.innerText = 'Sau'; nextBtn.disabled = currentPage === totalPages;
-            nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; renderTable(); } };
-            paginationContainer.appendChild(nextBtn);
-        }
-
-        function renderTable() {
-            const query = searchInput.value.toLowerCase(); const filterClassVal = filterClassification ? filterClassification.value : '';
-            let filtered = customers.filter(c => {
-                const matchSearch = String(c.customerId || '').toLowerCase().includes(query) || (c.companyName && String(c.companyName).toLowerCase().includes(query)) ||
-                    (c.taxId && String(c.taxId).toLowerCase().includes(query)) || (c.contactName && String(c.contactName).toLowerCase().includes(query)) ||
-                    (c.phone && String(c.phone).includes(query)) || (c.classification && String(c.classification).toLowerCase().includes(query));
-                const matchClass = filterClassVal === '' || c.classification === filterClassVal;
-                return matchSearch && matchClass;
-            });
-            filtered.sort((a, b) => b.sales - a.sales);
-            const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
-            if (currentPage > totalPages) currentPage = totalPages;
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const paginatedItems = filtered.slice(startIndex, startIndex + itemsPerPage);
+    <!-- Modal Phân tích Sản phẩm -->
+    <div id="productAnalysisModal" class="modal-overlay">
+        <div class="modal-content" style="width: 95%; max-width: 1100px; display: flex; flex-direction: column; max-height: 90vh; background: #f8fafc; padding: 25px; border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                <h3 style="color: var(--primary-color); margin: 0; display: inline-flex; align-items: center; gap: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                      <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319z"/>
+                    </svg>
+                    <span id="productAnalysisTitle">Phân Tích Sản Phẩm & Doanh Thu</span>
+                </h3>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" id="btnExportProductAnalysisPDF" style="background: var(--primary-color); color: white; border: none; border-radius: 6px; padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; transition: all 0.2s;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                          <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+                        </svg>
+                        <span>In PDF</span>
+                    </button>
+                    <span id="btnCloseProductAnalysisModal" style="cursor: pointer; font-size: 24px; color: var(--text-muted); font-weight: bold; line-height: 1;">&times;</span>
+                </div>
+            </div>
             
-            tableBodyElement.innerHTML = '';
-            if (paginatedItems.length === 0) {
-                tableBodyElement.innerHTML = `<tr><td colspan="9" class="text-center" style="color: #94a3b8; padding: 30px;">Không có dữ liệu.</td></tr>`;
-                paginationContainer.innerHTML = ''; return;
-            }
-            paginatedItems.forEach((customer, index) => {
-                const tr = document.createElement('tr');
-                tr.onclick = () => { setFormData(customer); toggleEditMode(true); window.scrollTo({ top: 0, behavior: 'smooth' }); };
-                let salesColor = customer.sales >= 0 ? '#10b981' : '#ef4444';
-                let maKhColor = (customer.classification && classificationColors[customer.classification]) ? classificationColors[customer.classification] : 'var(--primary-color)';
-                let maKhTitle = customer.classification ? `Phân loại: ${customer.classification}` : 'Chưa phân loại';
-                tr.innerHTML = `
-                    <td class="text-center"><strong>${startIndex + index + 1}</strong></td>
-                    <td class="nowrap" style="color: ${maKhColor}; font-weight: bold;" title="${maKhTitle}">${customer.customerId}</td>
-                    <td class="nowrap">${customer.taxId || '-'}</td>
-                    <td><strong>${customer.companyName || '-'}</strong></td>
-                    <td class="nowrap">${customer.contactName || '-'}</td>
-                    <td class="nowrap">${formatPhoneNumber(customer.phone)}</td>
-                    <td class="text-right money nowrap" style="color: ${salesColor};">${formatCurrency(customer.sales)}</td>
-                    <td class="text-center nowrap" style="padding: 6px 12px;">
-                        <button type="button" class="history-btn-icon" onclick="event.stopPropagation(); showHistoryModal('${customer.customerId}')" title="Xem lịch sử cập nhật" style="background: transparent; border: 1px solid var(--border-color); border-radius: 4px; padding: 4px 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s; color: var(--text-muted);">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
-                              <polyline points="1 4 1 10 7 10" />
-                              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-                              <circle cx="12" cy="12" r="5.5" fill="currentColor" stroke="none" />
-                              <path d="M12 9.5v2.5l1.5 1.5" stroke="#ffffff" stroke-width="1.5" />
+            <div style="overflow-y: auto; flex: 1; padding-right: 5px;">
+                <!-- KPI Cards -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; margin-bottom: 4px;">TỔNG SẢN PHẨM KHÁC NHAU</div>
+                        <div id="kpiTotalProducts" style="font-size: 18px; font-weight: bold; color: #10b981;">0</div>
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; margin-bottom: 4px;">TỔNG LƯỢT MUA</div>
+                        <div id="kpiTotalPurchases" style="font-size: 18px; font-weight: bold; color: #3b82f6;">0</div>
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 11px; color: var(--text-muted); font-weight: bold; margin-bottom: 4px;">DOANH THU THÁNG</div>
+                        <div id="kpiProductRevenue" style="font-size: 18px; font-weight: bold; color: #f59e0b;">0 đ</div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <h4 style="margin-top: 0; margin-bottom: 15px; font-size: 14px;">Top 5 Sản Phẩm Bán Chạy Nhất</h4>
+                        <div style="position: relative; height: 240px;">
+                            <canvas id="chartTopProducts"></canvas>
+                        </div>
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <h4 style="margin-top: 0; margin-bottom: 15px; font-size: 14px;">Top 5 Sản Phẩm Doanh Thu Cao Nhất</h4>
+                        <div style="position: relative; height: 240px;">
+                            <canvas id="chartTopRevenueProducts"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New Charts: Phân loại sản phẩm & Top 5 sản phẩm nhiều KH mua -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center;">
+                        <h4 style="margin-top: 0; margin-bottom: 15px; font-size: 14px; width: 100%; text-align: left;">Tỷ Lệ Sản Phẩm Được Mua</h4>
+                        <div style="position: relative; width: 100%; max-width: 240px; height: 240px;">
+                            <canvas id="chartProductDistribution"></canvas>
+                        </div>
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <h4 style="margin-top: 0; margin-bottom: 15px; font-size: 14px;">Top 5 Sản Phẩm Có Nhiều Khách Hàng Mua Nhất</h4>
+                        <div style="position: relative; height: 240px;">
+                            <canvas id="chartTopProductsByCustomers"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table: Chi tiết sản phẩm -->
+                <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <h4 style="margin-top: 0; margin-bottom: 15px; font-size: 14px; font-weight: bold; text-align: center;">Chi Tiết Phân Tích Từng Sản Phẩm</h4>
+                    <div style="max-height: 400px; overflow-y: auto; overflow-x: hidden; width: 100%;">
+                        <table style="width: 100%; min-width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed;">
+                            <thead style="position: sticky; top: 0; z-index: 1;">
+                                <tr style="border-bottom: 2px solid #e2e8f0;">
+                                    <th style="width: 45%; padding: 8px 6px; background: #f8fafc; font-weight: bold; text-align: left; font-size: 12px;">Tên Sản Phẩm</th>
+                                    <th style="width: 20%; padding: 8px 6px; background: #f8fafc; font-weight: bold; text-align: center; font-size: 12px;">Số Lượt Mua</th>
+                                    <th style="width: 35%; padding: 8px 6px; background: #f8fafc; font-weight: bold; text-align: right; font-size: 12px;">Doanh Thu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productAnalysisTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 20px; display: flex; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <button type="button" id="btnCloseProductAnalysisBtn" class="btn btn-secondary" style="width: auto; min-width: 100px;">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Thao tác Khách hàng (3 Options) -->
+    <div id="customerActionModal" class="modal-overlay">
+        <div class="modal-content customer-action-modal">
+            <div class="action-modal-header">
+                <div>
+                    <h3 class="action-modal-title">Khách hàng: <span id="actionModalCustId" class="cust-id-highlight"></span></h3>
+                    <div id="actionModalCompanyName" class="action-modal-subtitle"></div>
+                </div>
+                <span id="btnCloseCustomerActionModal" class="action-modal-close">&times;</span>
+            </div>
+            <div class="action-modal-body">
+                <p class="action-modal-prompt">Vui lòng chọn thao tác bạn muốn thực hiện:</p>
+                <div class="action-options-list">
+                    <!-- Option 1 -->
+                    <div class="action-option-card" id="btnOptEditInfo">
+                        <div class="action-option-icon icon-bg-warm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#854D0E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                             </svg>
-                        </button>
-                    </td>
-                    <td>${customer.notes || '-'}</td>
-                `;
-                tableBodyElement.appendChild(tr);
-            });
-            renderPagination(filtered.length);
-        }
+                        </div>
+                        <div class="action-option-content">
+                            <div class="action-option-title text-main">Chỉnh sửa thông tin khách hàng</div>
+                            <div class="action-option-desc">Cập nhật mã số thuế, tên công ty, phân loại, người liên hệ, SĐT...</div>
+                        </div>
+                    </div>
 
-        function checkSoftDuplicates(data) {
-            let warnings = [];
-            customers.forEach(c => {
-                if (String(c.customerId || '').toLowerCase() !== String(data.customerId || '').toLowerCase()) {
-                    if (data.taxId && c.taxId && String(c.taxId) === String(data.taxId)) warnings.push(`- <strong>Mã số thuế</strong> trùng với khách hàng <span style="color: var(--primary-color)">${c.customerId}</span>`);
-                    if (data.companyName && c.companyName && String(c.companyName).toLowerCase() === String(data.companyName).toLowerCase()) warnings.push(`- <strong>Tên công ty</strong> trùng với khách hàng <span style="color: var(--primary-color)">${c.customerId}</span>`);
-                    if (data.phone && c.phone && String(c.phone) === String(data.phone)) warnings.push(`- <strong>Số điện thoại</strong> trùng với khách hàng <span style="color: var(--primary-color)">${c.customerId}</span>`);
-                }
-            });
-            return [...new Set(warnings)];
-        }
+                    <!-- Option 2 -->
+                    <div class="action-option-card" id="btnOptUpdateSales">
+                        <div class="action-option-icon icon-bg-green">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.91 8.84 8.56 2.23a1.93 1.93 0 0 0-1.81 0L1.31 5.4a1.93 1.93 0 0 0-.9 1.66v10a1.93 1.93 0 0 0 .9 1.66l5.44 3.16a1.93 1.93 0 0 0 1.81 0l12.35-6.61a1.93 1.93 0 0 0 .9-1.66V10.5a1.93 1.93 0 0 0-.9-1.66z"></path>
+                                <line x1="12" y1="12" x2="12" y2="22"></line>
+                            </svg>
+                        </div>
+                        <div class="action-option-content">
+                            <div class="action-option-title text-green">Cập nhật doanh số bán hàng</div>
+                            <div class="action-option-desc">Cập nhật doanh số phát sinh, thể loại hàng & mô tả sản phẩm đã bán</div>
+                        </div>
+                    </div>
 
-        async function proceedWithSave(data, isUpdating) {
-            data.lastUpdated = new Date().toISOString(); 
-            btnSubmit.innerText = 'Đang lưu...'; btnSubmit.disabled = true;
-            btnUpdate.innerText = 'Đang lưu...'; btnUpdate.disabled = true;
+                    <!-- Option 3 -->
+                    <div class="action-option-card" id="btnOptViewHistory">
+                        <div class="action-option-icon icon-bg-blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y1="13"></line>
+                                <line x1="16" y1="17" x2="8" y1="17"></line>
+                            </svg>
+                        </div>
+                        <div class="action-option-content">
+                            <div class="action-option-title text-blue">Xem lịch sử cập nhật chi tiết</div>
+                            <div class="action-option-desc">Xem timeline đầy đủ các thay đổi, biến động doanh số & ghi chú</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="action-modal-footer">
+                <button type="button" id="btnCloseCustomerActionBtn" class="btn-close-custom">Đóng</button>
+            </div>
+        </div>
+    </div>
 
-            if (isUpdating) {
-                const payload = mapToSupabase(data);
-                const { error } = await supabaseClient.from('Quan ly ban hang').update(payload).eq('customer_id', data.customerId);
-                if (error) alert("Lỗi khi cập nhật máy chủ: " + error.message);
-            } else {
-                const exists = customers.find(c => String(c.customerId || '').toLowerCase() === String(data.customerId || '').toLowerCase());
-                if (exists) {
-                    btnSubmit.innerText = 'Lưu Thông Tin'; btnSubmit.disabled = false;
-                    btnUpdate.innerText = 'Cập nhật'; btnUpdate.disabled = false;
-                    pendingCustomerData = data;
-                    modalMessage.innerHTML = `Mã khách hàng <strong>"${data.customerId}"</strong> đã tồn tại. Bạn có muốn cập nhật thông tin và doanh số không?`;
-                    modal.style.display = 'flex';
-                    return;
-                } else {
-                    data.history = [{ date: data.lastUpdated, amount: data.sales, note: 'Tạo mới', updated_by: currentUserEmail ? currentUserEmail.split('@')[0] : 'hệ thống' }];
-                    const payload = mapToSupabase(data);
-                    const { error } = await supabaseClient.from('Quan ly ban hang').insert([payload]);
-                    if (error) alert("Lỗi khi thêm mới dữ liệu: " + error.message);
-                }
-            }
-
-            await fetchCustomers(); 
-            toggleEditMode(false); 
-            btnSubmit.innerText = 'Lưu Thông Tin'; btnSubmit.disabled = false;
-            btnUpdate.innerText = 'Cập nhật'; btnUpdate.disabled = false;
-
-            if (pendingNotification) {
-                notificationTitle.innerText = pendingNotification.title;
-                notificationTitle.style.color = pendingNotification.titleColor;
-                notificationMessage.innerHTML = pendingNotification.message;
-                notificationModal.style.display = 'flex';
-                pendingNotification = null; 
-            }
-        }
-
-        function handleSaveAction(data, isUpdating) {
-            if (!data.customerId) return;
-            const softWarnings = checkSoftDuplicates(data);
-            if (softWarnings.length > 0) {
-                pendingActionData = { data, isUpdating };
-                warningModalMessage.innerHTML = softWarnings.join('<br>') + `<br><br>Bạn có chắc chắn muốn tiếp tục lưu thông tin này?`;
-                warningModal.style.display = 'flex';
-            } else { proceedWithSave(data, isUpdating); }
-        }
-
-        form.addEventListener('submit', function(e) { 
-            e.preventDefault(); 
-            if (isEditing) btnUpdate.click(); else handleSaveAction(getFormData(), false); 
-        });
-
-        btnUpdate.addEventListener('click', function() { 
-            const data = getFormData();
-            const addedSalesStr = addSalesInput.value.replace(/[,.]/g, '');
-            const existingCustIndex = customers.findIndex(c => String(c.customerId).toLowerCase() === String(data.customerId).toLowerCase());
-            data.history = existingCustIndex !== -1 ? (customers[existingCustIndex].history || []) : [];
-
-            if (addedSalesStr !== '-' && addedSalesStr !== '') {
-                const addedSales = Number(addedSalesStr) || 0;
-                if (addedSales !== 0) {
-                    data.sales += addedSales; 
-                    data.history.push({ date: new Date().toISOString(), amount: addedSales, note: 'Cập nhật (+/-)', updated_by: currentUserEmail ? currentUserEmail.split('@')[0] : 'hệ thống' });
-                    let titleColor = addedSales > 0 ? '#10b981' : '#ef4444';
-                    let actionText = addedSales > 0 ? `Tăng thêm ${formatCurrency(addedSales)}` : `Giảm đi ${formatCurrency(Math.abs(addedSales))}`;
-                    pendingNotification = {
-                        title: 'Thành công!', titleColor: titleColor,
-                        message: `Doanh số gốc của khách hàng <strong>${data.customerId}</strong> đã được <br><strong style="color: ${titleColor}; font-size: 18px;">${actionText}</strong>`
-                    };
-                }
-            }
-            handleSaveAction(data, true); 
-        });
-
-        document.getElementById('btnCloseNotification').addEventListener('click', function() { notificationModal.style.display = 'none'; });
-        document.getElementById('btnCloseHistoryModal').addEventListener('click', () => { document.getElementById('historyModal').style.display = 'none'; });
-        document.getElementById('btnCloseHistoryBtn').addEventListener('click', () => { document.getElementById('historyModal').style.display = 'none'; });
-        document.getElementById('btnCloseAnalysisModal').addEventListener('click', () => { document.getElementById('analysisModal').style.display = 'none'; });
-        document.getElementById('btnCloseAnalysisBtn').addEventListener('click', () => { document.getElementById('analysisModal').style.display = 'none'; });
-        document.getElementById('btnAnalyzeCustomers').addEventListener('click', showAnalysisModal);
-        document.getElementById('btnConfirmWarning').addEventListener('click', function() { if (pendingActionData) proceedWithSave(pendingActionData.data, pendingActionData.isUpdating); warningModal.style.display = 'none'; pendingActionData = null; });
-        document.getElementById('btnCancelWarning').addEventListener('click', function() { warningModal.style.display = 'none'; pendingActionData = null; });
-        document.getElementById('btnDelete').addEventListener('click', function() { const id = idInput.value.trim(); customerToDelete = id; deleteModalMessage.innerHTML = `Bạn có chắc chắn muốn xóa khách hàng <strong>"${id}"</strong> không?`; deleteModal.style.display = 'flex'; });
-        
-        document.getElementById('btnConfirmDelete').addEventListener('click', async function() { 
-            if (customerToDelete) { 
-                document.getElementById('btnConfirmDelete').innerText = 'Đang xóa...';
-                document.getElementById('btnConfirmDelete').disabled = true;
-                const { error } = await supabaseClient.from('Quan ly ban hang').delete().eq('customer_id', customerToDelete);
-                document.getElementById('btnConfirmDelete').innerText = 'Xóa';
-                document.getElementById('btnConfirmDelete').disabled = false;
-                
-                if (error) alert("Không thể xóa dòng dữ liệu: " + error.message);
-                else { await fetchCustomers(); toggleEditMode(false); }
-            } 
-            deleteModal.style.display = 'none'; 
-        });
-
-        document.getElementById('btnCancelDelete').addEventListener('click', function() { deleteModal.style.display = 'none'; });
-        document.getElementById('btnCancelEdit').addEventListener('click', function() { toggleEditMode(false); });
-        searchInput.addEventListener('input', () => { currentPage = 1; renderTable(); });
-        if (filterClassification) filterClassification.addEventListener('change', () => { currentPage = 1; renderTable(); });
-
-        document.getElementById('btnConfirmModal').addEventListener('click', async function() {
-            const index = customers.findIndex(c => String(c.customerId).toLowerCase() === String(pendingCustomerData.customerId).toLowerCase());
-            if (index !== -1) { 
-                pendingCustomerData.history = customers[index].history || [];
-                pendingCustomerData.lastUpdated = new Date().toISOString();
-                
-                const btn = document.getElementById('btnConfirmModal');
-                btn.innerText = 'Đang ghi đè...'; btn.disabled = true;
-                
-                const payload = mapToSupabase(pendingCustomerData);
-                const { error } = await supabaseClient.from('Quan ly ban hang').update(payload).eq('customer_id', pendingCustomerData.customerId);
-                
-                btn.innerText = 'Có, Cập nhật'; btn.disabled = false;
-                if (error) alert("Gặp lỗi khi ghi đè dữ liệu: " + error.message);
-                else await fetchCustomers();
-            }
-            modal.style.display = 'none'; toggleEditMode(false);
-        });
-        document.getElementById('btnCancelModal').addEventListener('click', () => { modal.style.display = 'none'; });
-        
-        function getFilteredAndSortedData() {
-            const query = searchInput.value.toLowerCase(); const filterClassVal = filterClassification ? filterClassification.value : '';
-            let filtered = customers.filter(c => {
-                const matchSearch = String(c.customerId || '').toLowerCase().includes(query) || (c.companyName && String(c.companyName).toLowerCase().includes(query)) ||
-                    (c.taxId && String(c.taxId).toLowerCase().includes(query)) || (c.contactName && String(c.contactName).toLowerCase().includes(query)) ||
-                    (c.phone && String(c.phone).includes(query)) || (c.classification && String(c.classification).toLowerCase().includes(query));
-                const matchClass = filterClassVal === '' || c.classification === filterClassVal;
-                return matchSearch && matchClass;
-            });
-            filtered.sort((a, b) => b.sales - a.sales);
-            return filtered;
-        }
-
-        document.getElementById('btnExportExcel').addEventListener('click', function() {
-            const data = getFilteredAndSortedData(); if (data.length === 0) return;
-            const exportData = data.map((c, index) => ({
-                "STT": index + 1, "Mã KH": c.customerId || "", "Phân loại": c.classification || "",
-                "MST": c.taxId || "", "Tên Công ty": c.companyName || "", "Người liên hệ": c.contactName || "",
-                "Số điện thoại": formatPhoneNumber(c.phone) === '-' ? '' : formatPhoneNumber(c.phone), "Doanh số KH (VNĐ)": c.sales || 0, "Ngày cập nhật": formatDateTime(c.lastUpdated), "Ghi chú": c.notes || ""
-            }));
-            const ws = XLSX.utils.json_to_sheet(exportData); const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Doanh_So_Khach_Hang"); XLSX.writeFile(wb, "Bang_Xep_Hang_Doanh_So.xlsx");
-        });
-
-        document.getElementById('btnExportPDF').addEventListener('click', function() {
-            const data = getFilteredAndSortedData(); if (data.length === 0) return;
-            const tableBodyData = [];
-            tableBodyData.push([{ text: 'STT', style: 'tableHeader', alignment: 'center' }, { text: 'Mã KH', style: 'tableHeader' }, { text: 'MST', style: 'tableHeader' }, { text: 'Tên Công ty', style: 'tableHeader' }, { text: 'Người LH', style: 'tableHeader' }, { text: 'SĐT', style: 'tableHeader' }, { text: 'Doanh số (VNĐ)', style: 'tableHeader', alignment: 'right' }, { text: 'Ngày cập nhật', style: 'tableHeader' }, { text: 'Ghi chú', style: 'tableHeader' }]);
-            data.forEach((c, index) => {
-                let salesColor = c.sales >= 0 ? '#10b981' : '#ef4444'; let maKhColor = (c.classification && classificationColors[c.classification]) ? classificationColors[c.classification] : '#2563eb';
-                tableBodyData.push([
-                    { text: (index + 1).toString(), alignment: 'center' }, { text: c.customerId || '-', color: maKhColor, bold: true },
-                    { text: c.taxId || '-' }, { text: c.companyName || '-', bold: true }, { text: c.contactName || '-' }, { text: formatPhoneNumber(c.phone) },
-                    { text: formatCurrency(c.sales || 0), alignment: 'right', color: salesColor, bold: true },
-                    { text: formatDateTime(c.lastUpdated), fontSize: 9 }, { text: c.notes || '-' }
-                ]);
-            });
-            const docDefinition = {
-                pageOrientation: 'landscape', pageSize: 'A4',
-                content: [ { text: 'Bảng Xếp hạng Doanh số Khách hàng', style: 'header' }, { table: { headerRows: 1, widths: ['4%', '11%', '9%', '21%', '11%', '10%', '13%', '12%', '9%'], body: tableBodyData }, layout: { hLineWidth: function (i) { return 1; }, vLineWidth: function (i) { return 1; }, hLineColor: function (i) { return '#e2e8f0'; }, vLineColor: function (i) { return '#e2e8f0'; }, paddingLeft: function(i) { return 6; }, paddingRight: function(i) { return 6; }, paddingTop: function(i) { return 8; }, paddingBottom: function(i) { return 8; } } } ],
-                styles: { header: { fontSize: 16, bold: true, alignment: 'center', margin: [0, 0, 0, 15], color: '#2563eb' }, tableHeader: { bold: true, fontSize: 11, color: '#475569', fillColor: '#f8fafc' } }, defaultStyle: { fontSize: 10 }
-            };
-            pdfMake.createPdf(docDefinition).download('Bang_Xep_Hang_Doanh_So.pdf');
-        });
-
-        const reportMonthSelect = document.getElementById('reportMonthSelect');
-        document.getElementById('btnCloseReport').addEventListener('click', () => { document.getElementById('reportModal').style.display = 'none'; });
-        function populateMonthSelect() {
-            reportMonthSelect.innerHTML = ''; const now = new Date();
-            for (let i = 0; i < 12; i++) {
-                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                const month = d.getMonth() + 1; const year = d.getFullYear(); const option = document.createElement('option');
-                option.value = `${year}-${month}`; option.text = i === 0 ? `Tháng ${month}/${year} (Tháng này)` : `Tháng ${month}/${year}`;
-                reportMonthSelect.appendChild(option);
-            }
-        }
-        function showRevenueReport() {
-            const selectedValue = reportMonthSelect.value; let year, monthIndex, monthLabel;
-            if (selectedValue) { const parts = selectedValue.split('-'); year = parseInt(parts[0], 10); monthIndex = parseInt(parts[1], 10) - 1; monthLabel = `${monthIndex + 1}/${year}`; } 
-            else { const now = new Date(); year = now.getFullYear(); monthIndex = now.getMonth(); monthLabel = `${monthIndex + 1}/${year}`; }
-            let start = new Date(year, monthIndex, 1); start.setHours(0,0,0,0); let end = new Date(year, monthIndex + 1, 0); end.setHours(23, 59, 59, 999);
-            let totalRevenuePeriod = 0; let transactionsInPeriod = [];
-            customers.forEach(c => {
-                if (c.history && c.history.length > 0) {
-                    c.history.forEach(tx => {
-                        const txDate = new Date(tx.date);
-                        if (txDate >= start && txDate <= end && tx.amount !== 0) transactionsInPeriod.push({ customer: c, tx: tx, date: txDate });
-                    });
-                }
-            });
-            transactionsInPeriod.sort((a, b) => b.date - a.date);
-            const reportTableBody = document.getElementById('reportTableBody'); reportTableBody.innerHTML = '';
-            if (transactionsInPeriod.length === 0) {
-                reportTableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 30px; color: #64748b;">Không có giao dịch/biến động doanh thu nào phát sinh trong <strong>Tháng ${monthLabel}</strong>.</td></tr>`;
-                document.getElementById('reportTotalRevenue').innerText = "0 đ"; document.getElementById('reportTotalRevenue').style.color = "#64748b";
-            } else {
-                transactionsInPeriod.forEach(item => {
-                    const c = item.customer; const tx = item.tx;
-                    const formattedTime = item.date.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                    totalRevenuePeriod += tx.amount; let amountColor = tx.amount > 0 ? '#10b981' : '#ef4444';
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px; text-align: center;">${formattedTime}</td><td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: var(--primary-color);">${c.customerId || '-'}</td><td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${c.companyName || '-'}</td><td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; color: ${amountColor}; font-weight: bold;">${formatCurrency(tx.amount)}</td><td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px;">${tx.note || '-'}</td>`;
-                    reportTableBody.appendChild(tr);
-                });
-                document.getElementById('reportTotalRevenue').innerText = formatCurrency(totalRevenuePeriod); document.getElementById('reportTotalRevenue').style.color = totalRevenuePeriod >= 0 ? "#10b981" : "#ef4444";
-            }
-            document.getElementById('reportModal').style.display = 'flex';
-        }
-        reportMonthSelect.addEventListener('change', showRevenueReport);
-        document.getElementById('btnReportMonth').addEventListener('click', () => { populateMonthSelect(); showRevenueReport(); });
-
-        let chartClassificationInstance = null;
-        let chartTopCustomersInstance = null;
-        let chartRevenueTrendInstance = null;
-
-        function showAnalysisModal() {
-            const selectedValue = reportMonthSelect.value;
-            let year, monthIndex, monthLabel;
-            if (selectedValue) {
-                const parts = selectedValue.split('-');
-                year = parseInt(parts[0], 10);
-                monthIndex = parseInt(parts[1], 10) - 1;
-                monthLabel = `${monthIndex + 1}/${year}`;
-            } else {
-                const now = new Date();
-                year = now.getFullYear();
-                monthIndex = now.getMonth();
-                monthLabel = `${monthIndex + 1}/${year}`;
-            }
-
-            document.getElementById('analysisTitle').innerText = `Phân Tích Doanh Thu & Khách Hàng - Tháng ${monthLabel}`;
-
-            let start = new Date(year, monthIndex, 1);
-            start.setHours(0,0,0,0);
-            let end = new Date(year, monthIndex + 1, 0);
-            end.setHours(23, 59, 59, 999);
-
-            let totalRevenueMonth = 0;
-            let txCountMonth = 0;
-            const customerRevenueMap = {};
-            const classCountMap = {
-                "Khách mới": 0,
-                "Thường xuyên": 0,
-                "Không thường xuyên": 0,
-                "Chưa liên hệ được": 0,
-                "Không nhu cầu": 0,
-                "Chưa phân loại": 0
-            };
-
-            // Xác định khoảng thời gian tháng trước để so sánh tăng trưởng/sụt giảm
-            let prevStart = new Date(year, monthIndex - 1, 1);
-            prevStart.setHours(0,0,0,0);
-            let prevEnd = new Date(year, monthIndex, 0);
-            prevEnd.setHours(23, 59, 59, 999);
-
-            let newCustCount = 0;
-            let returningCustCount = 0;
-            let newCustRevenue = 0;
-            let returningCustRevenue = 0;
-            let totalActiveCust = 0;
-
-            customers.forEach(c => {
-                let customerHasTxInMonth = false;
-                let customerRevenueInMonth = 0;
-
-                if (c.history && c.history.length > 0) {
-                    c.history.forEach(tx => {
-                        const txDate = new Date(tx.date);
-                        if (txDate >= start && txDate <= end && tx.amount !== 0) {
-                            totalRevenueMonth += tx.amount;
-                            txCountMonth++;
-                            customerRevenueInMonth += tx.amount;
-                            customerHasTxInMonth = true;
-                        }
-                    });
-                }
-
-                if (customerHasTxInMonth) {
-                    totalActiveCust++;
-                    
-                    // Xác định khách mới trong tháng (giao dịch đầu tiên nằm trong tháng được chọn)
-                    const dates = c.history.map(tx => new Date(tx.date).getTime());
-                    const minDate = new Date(Math.min(...dates));
-                    const isNewThisMonth = minDate >= start && minDate <= end;
-                    
-                    if (isNewThisMonth) {
-                        newCustCount++;
-                        newCustRevenue += customerRevenueInMonth;
-                    } else {
-                        returningCustCount++;
-                        returningCustRevenue += customerRevenueInMonth;
-                    }
-
-                    customerRevenueMap[c.customerId] = {
-                        customerId: c.customerId,
-                        companyName: c.companyName || '-',
-                        classification: c.classification || 'Chưa phân loại',
-                        amount: customerRevenueInMonth
-                    };
-
-                    const classification = c.classification || 'Chưa phân loại';
-                    if (classCountMap.hasOwnProperty(classification)) {
-                        classCountMap[classification]++;
-                    } else {
-                        classCountMap["Chưa phân loại"]++;
-                    }
-                }
-            });
-
-            // Tính toán so sánh với tháng trước
-            let prevRevenueMonth = 0;
-            customers.forEach(c => {
-                if (c.history && c.history.length > 0) {
-                    c.history.forEach(tx => {
-                        const txDate = new Date(tx.date);
-                        if (txDate >= prevStart && txDate <= prevEnd && tx.amount !== 0) {
-                            prevRevenueMonth += tx.amount;
-                        }
-                    });
-                }
-            });
-
-            const revDiff = totalRevenueMonth - prevRevenueMonth;
-            let revPctStr = '';
-            let compareColor = 'var(--text-muted)';
-            if (prevRevenueMonth > 0) {
-                const pct = Math.round((revDiff / prevRevenueMonth) * 100);
-                const sign = pct >= 0 ? '+' : '';
-                revPctStr = `${sign}${pct}% so với tháng trước (${pct >= 0 ? '+' : ''}${formatCurrency(revDiff)})`;
-                compareColor = pct >= 0 ? '#10b981' : '#ef4444';
-            } else if (totalRevenueMonth > 0) {
-                revPctStr = `Mới (+${formatCurrency(totalRevenueMonth)})`;
-                compareColor = '#10b981';
-            } else {
-                revPctStr = `0% so với tháng trước`;
-            }
-
-            // Tính toán tổng doanh thu của toàn bộ hệ thống
-            const totalWebSales = customers.reduce((sum, c) => sum + (c.sales || 0), 0);
-
-            // Tính toán tỷ lệ phần trăm khách mới/cũ
-            const newCustRatio = totalActiveCust > 0 ? Math.round((newCustCount / totalActiveCust) * 100) : 0;
-            const newCustRevenueRatio = totalRevenueMonth > 0 ? Math.round((newCustRevenue / totalRevenueMonth) * 100) : 0;
-            
-            const returnCustRatio = totalActiveCust > 0 ? Math.round((returningCustCount / totalActiveCust) * 100) : 0;
-            const returnCustRevenueRatio = totalRevenueMonth > 0 ? Math.round((returningCustRevenue / totalRevenueMonth) * 100) : 0;
-
-            // Cập nhật thẻ chỉ số KPI chính
-            document.getElementById('kpiRevenueAllTime').innerText = formatCurrency(totalWebSales);
-            document.getElementById('kpiRevenue').innerText = formatCurrency(totalRevenueMonth);
-            document.getElementById('kpiRevenueCompare').innerText = revPctStr;
-            document.getElementById('kpiRevenueCompare').style.color = compareColor;
-            document.getElementById('kpiTxCount').innerText = txCountMonth;
-            document.getElementById('kpiNewCustomers').innerText = newCustCount;
-
-            // Cập nhật các thẻ tỷ lệ mới/cũ
-            document.getElementById('kpiNewCustRatio').innerHTML = `${newCustRatio}% <span style="font-size: 12px; font-weight: normal; color: var(--text-muted);">${newCustCount}/${totalActiveCust} KH</span>`;
-            document.getElementById('kpiNewCustRevenueRatio').innerText = `Đóng góp: ${newCustRevenueRatio}% doanh số (${formatCurrency(newCustRevenue)})`;
-            
-            document.getElementById('kpiReturnCustRatio').innerHTML = `${returnCustRatio}% <span style="font-size: 12px; font-weight: normal; color: var(--text-muted);">${returningCustCount}/${totalActiveCust} KH</span>`;
-            document.getElementById('kpiReturnCustRevenueRatio').innerText = `Đóng góp: ${returnCustRevenueRatio}% doanh số (${formatCurrency(returningCustRevenue)})`;
-
-            // Tính xu hướng doanh thu từ tháng 1 đến tháng 12 của năm được chọn (ví dụ năm 2026)
-            const last12Months = [];
-            for (let i = 0; i < 12; i++) {
-                last12Months.push({
-                    year: year,
-                    month: i + 1,
-                    label: `T${String(i + 1).padStart(2, '0')}-${year}`
-                });
-            }
-
-            const monthlyRevenues = last12Months.map(m => {
-                const mStart = new Date(m.year, m.month - 1, 1);
-                mStart.setHours(0,0,0,0);
-                const mEnd = new Date(m.year, m.month, 0);
-                mEnd.setHours(23, 59, 59, 999);
-
-                let rev = 0;
-                customers.forEach(c => {
-                    if (c.history && c.history.length > 0) {
-                        c.history.forEach(tx => {
-                            const txDate = new Date(tx.date);
-                            if (txDate >= mStart && txDate <= mEnd && tx.amount !== 0) {
-                                rev += tx.amount;
-                            }
-                        });
-                    }
-                });
-                return rev;
-            });
-
-            // Populate table details
-            const analysisTableBody = document.getElementById('analysisTableBody');
-            analysisTableBody.innerHTML = '';
-            
-            const activeCustomersList = Object.values(customerRevenueMap).sort((a, b) => b.amount - a.amount);
-            if (activeCustomersList.length === 0) {
-                analysisTableBody.innerHTML = `<tr><td colspan="2" class="text-center" style="color: var(--text-muted); padding: 15px;">Không có dữ liệu giao dịch trong tháng này.</td></tr>`;
-            } else {
-                activeCustomersList.forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.style.borderBottom = '1px solid #e2e8f0';
-                    tr.innerHTML = `
-                        <td style="width: 75% !important; max-width: 75% !important; padding: 10px 8px; font-weight: bold; color: var(--primary-color); text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.customerId}">${item.customerId}</td>
-                        <td style="width: 25% !important; max-width: 25% !important; padding: 10px 8px; text-align: right; font-weight: bold; color: ${item.amount > 0 ? '#10b981' : '#ef4444'}; white-space: nowrap;">${formatCurrency(item.amount)}</td>
-                    `;
-                    analysisTableBody.appendChild(tr);
-                });
-            }
-
-            // Create charts
-            createAnalysisCharts(classCountMap, activeCustomersList.slice(0, 5), last12Months.map(m => m.label), monthlyRevenues);
-
-            document.getElementById('analysisModal').style.display = 'flex';
-        }
-
-        function createAnalysisCharts(classCounts, topCustomers, trendLabels, trendData) {
-            // Destroy previous instances
-            if (chartClassificationInstance) chartClassificationInstance.destroy();
-            if (chartTopCustomersInstance) chartTopCustomersInstance.destroy();
-            if (chartRevenueTrendInstance) chartRevenueTrendInstance.destroy();
-
-            // 1. Classification doughnut chart
-            const ctxClass = document.getElementById('chartClassification').getContext('2d');
-            const classLabels = Object.keys(classCounts).filter(k => classCounts[k] > 0);
-            const classData = classLabels.map(k => classCounts[k]);
-            const classColors = classLabels.map(k => classificationColors[k] || '#94a3b8');
-
-            if (classData.length === 0) {
-                classLabels.push("Không có dữ liệu");
-                classData.push(1);
-                classColors.push("#cbd5e1");
-            }
-
-            chartClassificationInstance = new Chart(ctxClass, {
-                type: 'doughnut',
-                data: {
-                    labels: classLabels,
-                    datasets: [{
-                        data: classData,
-                        backgroundColor: classColors,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                font: { size: 11 }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // 2. Top customers bar chart
-            const ctxTop = document.getElementById('chartTopCustomers').getContext('2d');
-            const topLabels = topCustomers.map(c => c.customerId);
-            const topData = topCustomers.map(c => c.amount);
-
-            chartTopCustomersInstance = new Chart(ctxTop, {
-                type: 'bar',
-                data: {
-                    labels: topLabels,
-                    datasets: [{
-                        label: 'Doanh thu tăng (VNĐ)',
-                        data: topData,
-                        backgroundColor: '#3b82f6',
-                        borderColor: '#2563eb',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        x: {
-                            ticks: {
-                                callback: function(value) {
-                                    if (value >= 1e6) return (value / 1e6) + ' Tr';
-                                    return value.toLocaleString('vi-VN');
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // 3. Revenue Trend line chart
-            const ctxTrend = document.getElementById('chartRevenueTrend').getContext('2d');
-            chartRevenueTrendInstance = new Chart(ctxTrend, {
-                type: 'line',
-                data: {
-                    labels: trendLabels,
-                    datasets: [{
-                        label: 'Doanh thu tháng (VNĐ)',
-                        data: trendData,
-                        borderColor: '#ea580c',
-                        backgroundColor: 'rgba(234, 88, 12, 0.05)',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#2563eb',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        tension: 0.35,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: {
-                        padding: {
-                            top: 25
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `Doanh thu: ${formatCurrency(context.raw)}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            grace: '20%',
-                            ticks: {
-                                callback: function(value) {
-                                    if (value >= 1e6) return (value / 1e6).toFixed(1) + ' Tr';
-                                    return value.toLocaleString('vi-VN') + ' đ';
-                                }
-                            },
-                            grid: {
-                                color: '#f1f5f9'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                },
-                plugins: [{
-                    id: 'customDataLabels',
-                    afterDatasetsDraw: function(chart) {
-                        const ctx = chart.ctx;
-                        chart.data.datasets.forEach((dataset, datasetIndex) => {
-                            const meta = chart.getDatasetMeta(datasetIndex);
-                            meta.data.forEach((point, index) => {
-                                const dataVal = dataset.data[index];
-                                const label = dataVal === 0 ? '0 đ' : formatCurrency(dataVal);
-                                
-                                ctx.font = 'bold 11px sans-serif';
-                                const textWidth = ctx.measureText(label).width;
-                                const textHeight = 12;
-                                
-                                const x = point.x;
-                                const y = point.y - 18;
-                                
-                                ctx.fillStyle = '#fef08a';
-                                ctx.strokeStyle = '#facc15';
-                                ctx.lineWidth = 1;
-                                ctx.beginPath();
-                                if (ctx.roundRect) {
-                                    ctx.roundRect(x - textWidth/2 - 4, y - textHeight - 2, textWidth + 8, textHeight + 6, 3);
-                                } else {
-                                    ctx.rect(x - textWidth/2 - 4, y - textHeight - 2, textWidth + 8, textHeight + 6);
-                                }
-                                ctx.fill();
-                                ctx.stroke();
-                                
-                                ctx.fillStyle = '#854d0e';
-                                ctx.textAlign = 'center';
-                                ctx.textBaseline = 'middle';
-                                ctx.fillText(label, x, y - textHeight/2 + 1);
-                            });
-                        });
-                    }
-                }]
-            });
-        }
-
-        const btnImportExcel = document.getElementById('btnImportExcel');
-        const excelImportModal = document.getElementById('excelImportModal');
-        const excelImportMonth = document.getElementById('excelImportMonth');
-        const btnCancelExcelImport = document.getElementById('btnCancelExcelImport');
-        const btnConfirmExcelImport = document.getElementById('btnConfirmExcelImport');
-        
-        let pendingExcelData = null;
-
-        btnImportExcel.addEventListener('click', function() { fileInputExcel.value = null; fileInputExcel.click(); });
-
-        fileInputExcel.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                try {
-                    const data = new Uint8Array(event.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    const firstSheetName = workbook.SheetNames[0];
-                    pendingExcelData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName], { defval: "" }); 
-                    
-                    // Hiển thị modal chọn tháng
-                    populateExcelImportMonths();
-                    excelImportModal.style.display = 'flex';
-                } catch (error) {
-                    alert("Không thể đọc tệp Excel. Vui lòng kiểm tra lại cấu trúc file!");
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        });
-
-        function populateExcelImportMonths() {
-            if (!excelImportMonth) return;
-            excelImportMonth.innerHTML = '';
-            const now = new Date();
-            for (let i = 0; i < 12; i++) {
-                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                const month = d.getMonth() + 1;
-                const year = d.getFullYear();
-                const option = document.createElement('option');
-                option.value = `${year}-${month}`;
-                option.text = i === 0 ? `Tháng ${month}/${year} (Tháng này)` : `Tháng ${month}/${year}`;
-                excelImportMonth.appendChild(option);
-            }
-        }
-
-        if (btnCancelExcelImport) {
-            btnCancelExcelImport.addEventListener('click', function() {
-                excelImportModal.style.display = 'none';
-                pendingExcelData = null;
-            });
-        }
-
-        if (btnConfirmExcelImport) {
-            btnConfirmExcelImport.addEventListener('click', async function() {
-                if (!pendingExcelData) return;
-                
-                const selectedValue = excelImportMonth.value;
-                const parts = selectedValue.split('-');
-                const selectedYear = parseInt(parts[0], 10);
-                const selectedMonth = parseInt(parts[1], 10); // 1-indexed
-
-                // Ngày ghi nhận (chọn ngày 28 của tháng đó để an toàn và tránh múi giờ lệch)
-                const targetDate = new Date(selectedYear, selectedMonth - 1, 28, 12, 0, 0).toISOString();
-                const nowStr = new Date().toISOString();
-
-                excelImportModal.style.display = 'none';
-                btnImportExcel.innerText = "Đang xử lý...";
-                btnImportExcel.disabled = true;
-
-                try {
-                    let importedCount = 0;
-                    let updatedCount = 0;
-                    const payloadsToUpsert = [];
-
-                    pendingExcelData.forEach(row => {
-                        const normRow = {};
-                        for (let k in row) if (row.hasOwnProperty(k)) normRow[k.trim().toLowerCase()] = row[k];
-                        const custId = String(normRow["mã kh"] || normRow["mã khách hàng"] || normRow["customerid"] || normRow["mã"] || "").trim();
-                        if (!custId) return;
-                        
-                        let salesVal = normRow["doanh số kh (vnđ)"] || normRow["doanh số (vnđ)"] || normRow["doanh số"] || normRow["sales"] || 0;
-                        if (typeof salesVal === 'string') salesVal = Number(salesVal.replace(/[,.]/g, '')) || 0;
-
-                        const newCustomer = {
-                            customerId: custId,
-                            taxId: String(normRow["mst"] || normRow["mã số thuế"] || normRow["taxid"] || "").trim(),
-                            companyName: String(normRow["tên công ty"] || normRow["công ty"] || normRow["companyname"] || "").trim(),
-                            classification: String(normRow["phân loại"] || normRow["phân loại khách hàng"] || normRow["classification"] || "").trim(),
-                            contactName: String(normRow["người liên hệ"] || normRow["người lh"] || normRow["contactname"] || "").trim(),
-                            phone: String(normRow["số điện thoại"] || normRow["sđt"] || normRow["phone"] || "").trim(),
-                            sales: Number(salesVal) || 0,
-                            notes: String(normRow["ghi chú"] || normRow["notes"] || "").trim(),
-                            lastUpdated: nowStr
-                        };
-
-                        const existingIndex = customers.findIndex(c => String(c.customerId).toLowerCase() === custId.toLowerCase());
-                        if (existingIndex !== -1) {
-                            // Cập nhật khách hàng cũ: dịch chuyển các bản ghi Excel cũ được ghi trong tháng này về tháng được chọn
-                            const currentMonth = new Date().getMonth();
-                            const currentYear = new Date().getFullYear();
-                            
-                            newCustomer.history = (customers[existingIndex].history || []).map(tx => {
-                                if (tx.note && tx.note.includes("Excel")) {
-                                    const txDate = new Date(tx.date);
-                                    // Nếu giao dịch được ghi trong tháng hiện tại (do import nhầm vừa rồi) -> dịch chuyển về tháng được chọn
-                                    if (txDate.getFullYear() === currentYear && txDate.getMonth() === currentMonth) {
-                                        tx.date = targetDate;
-                                    }
-                                }
-                                return tx;
-                            });
-
-                            const diff = newCustomer.sales - (customers[existingIndex].sales || 0);
-                            if (diff !== 0) {
-                                newCustomer.history.push({ date: targetDate, amount: diff, note: 'Cập nhật qua Excel', updated_by: currentUserEmail ? currentUserEmail.split('@')[0] : 'hệ thống' });
-                            }
-                            updatedCount++;
-                        } else {
-                            // Khách hàng mới: tạo lịch sử thuộc tháng được chọn
-                            newCustomer.history = [{ date: targetDate, amount: newCustomer.sales, note: 'Thêm mới qua Excel', updated_by: currentUserEmail ? currentUserEmail.split('@')[0] : 'hệ thống' }];
-                            importedCount++;
-                        }
-                        payloadsToUpsert.push(mapToSupabase(newCustomer));
-                    });
-
-                    if (payloadsToUpsert.length === 0) {
-                        notificationTitle.innerText = "Lỗi Cấu Trúc File";
-                        notificationTitle.style.color = "#ef4444";
-                        notificationMessage.innerHTML = "Không thể đọc dữ liệu! Hãy đảm bảo file Excel của bạn có chứa cột tiêu đề <strong>Mã KH</strong>.";
-                        notificationModal.style.display = 'flex';
-                    } else {
-                        const { error } = await supabaseClient.from('Quan ly ban hang').upsert(payloadsToUpsert, { onConflict: 'customer_id' });
-                        if (error) {
-                            alert("Gặp sự cố khi đồng bộ lên Supabase: " + error.message);
-                        } else {
-                            await fetchCustomers();
-                            notificationTitle.innerText = "Nhập Excel Thành Công!";
-                            notificationTitle.style.color = "#10b981";
-                            notificationMessage.innerHTML = `Đã thêm mới: <strong>${importedCount}</strong> khách hàng.<br>Đã cập nhật: <strong>${updatedCount}</strong> khách hàng.<br>Dữ liệu lịch sử đã được ghi nhận vào: <strong>Tháng ${selectedMonth}/${selectedYear}</strong>.`;
-                            notificationModal.style.display = 'flex';
-                        }
-                    }
-                } catch (error) {
-                    console.error(error);
-                    alert("Đã xảy ra lỗi trong quá trình xử lý dữ liệu nhập.");
-                } finally {
-                    btnImportExcel.innerText = "Nhập Excel";
-                    btnImportExcel.disabled = false;
-                    pendingExcelData = null;
-                }
-            });
-        }
-
-        // Bắt đầu chạy
-        initAuthListener();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
