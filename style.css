@@ -332,6 +332,16 @@ tbody tr:hover { background-color: #F8F3ED; cursor: pointer; }
 .form-control-custom::placeholder {
     color: #A49B8E;
 }
+
+/* Định dạng số cho trường cập nhật doanh số */
+#salesAmountInput {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
 .btn-submit-custom {
     width: 100%;
     background-color: #1B362B;
@@ -536,12 +546,12 @@ input[list]::-webkit-calendar-picker-indicator {
 
 .custom-autocomplete-item:hover,
 .custom-autocomplete-item.selected {
-    background: #F5EFE8;
-    color: var(--primary-color);
+    background: #F3F4F6;
+    color: #111827;
 }
 
 .custom-autocomplete-item:active {
-    background: #EFE8DF;
+    background: #E5E7EB;
 }
 
 .custom-autocomplete-dropdown::-webkit-scrollbar {
@@ -549,17 +559,17 @@ input[list]::-webkit-calendar-picker-indicator {
 }
 
 .custom-autocomplete-dropdown::-webkit-scrollbar-track {
-    background: #F8F4EF;
+    background: #F9FAFB;
     border-radius: 4px;
 }
 
 .custom-autocomplete-dropdown::-webkit-scrollbar-thumb {
-    background: var(--accent-warm);
+    background: #D1D5DB;
     border-radius: 4px;
 }
 
 .custom-autocomplete-dropdown::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-terracotta);
+    background: #9CA3AF;
 }
 
 .custom-autocomplete-empty {

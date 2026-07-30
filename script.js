@@ -247,6 +247,12 @@ async function fetchCustomers() {
             initCustomAutocomplete('editProductDesc', 'editProductDescDatalist');
             initCustomAutocomplete('salesCategorySelect', 'salesCategoryDatalist');
             initCustomAutocomplete('salesProductDescInput', 'salesProductDescDatalist');
+            
+            // Thêm format số có dấu phẩy cho trường cập nhật doanh số
+            const salesAmountInput = document.getElementById('salesAmountInput');
+            if (salesAmountInput) {
+                salesAmountInput.addEventListener('input', formatInputWithCommas);
+            }
         }, 100);
     } catch (e) {
         console.error("Lỗi hệ thống:", e);
