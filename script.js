@@ -589,6 +589,14 @@ function renderTable() {
     }
     paginatedItems.forEach((customer, index) => {
         const tr = document.createElement('tr');
+        
+        // Phân tầng doanh số để dễ nhìn
+        let salesTier = 'low';
+        if (customer.sales >= 200000000) salesTier = 'high';  // >= 200 triệu
+        else if (customer.sales >= 100000000) salesTier = 'medium-high';  // 100-200 triệu
+        else if (customer.sales >= 50000000) salesTier = 'medium';  // 50-100 triệu
+        tr.setAttribute('data-sales-tier', salesTier);
+        
         let salesColor = customer.sales >= 0 ? '#10b981' : '#ef4444';
         let maKhColor = (customer.classification && classificationColors[customer.classification]) ? classificationColors[customer.classification] : 'var(--primary-color)';
         let maKhTitle = customer.classification ? `Phân loại: ${customer.classification}` : 'Chưa phân loại';
@@ -1327,9 +1335,34 @@ function showAnalysisModal() {
             tr.style.borderBottom = '1px solid #e2e8f0';
             tr.style.cursor = 'pointer';
             tr.onclick = () => { if (item && item.customerId) showCustomerActionModal(item.customerId); };
+            
+            // Phân tầng doanh số để dễ nhìn (giống bảng chính)
+            let amountColor = '#10b981';
+            let fontSize = '15px';
+            let fontWeight = '600';
+            if (item.amount < 0) {
+                amountColor = '#ef4444';
+            } else if (item.amount >= 200000000) {  // >= 200 triệu
+                amountColor = '#047857';
+                fontSize = '17px';
+                fontWeight = '800';
+            } else if (item.amount >= 100000000) {  // 100-200 triệu
+                amountColor = '#059669';
+                fontSize = '16px';
+                fontWeight = '700';
+            } else if (item.amount >= 50000000) {  // 50-100 triệu
+                amountColor = '#10B981';
+                fontSize = '15px';
+                fontWeight = '700';
+            } else {  // < 50 triệu
+                amountColor = '#D97706';
+                fontSize = '15px';
+                fontWeight = '600';
+            }
+            
             tr.innerHTML = `
                 <td style="width: 75% !important; max-width: 75% !important; padding: 10px 8px; font-weight: bold; color: var(--primary-color); text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="customer-id-cell" title="Click để thao tác">${item.customerId}</td>
-                <td style="width: 25% !important; max-width: 25% !important; padding: 10px 8px; text-align: right; font-weight: bold; color: ${item.amount > 0 ? '#10b981' : '#ef4444'}; white-space: nowrap;">${formatCurrency(item.amount)}</td>
+                <td style="width: 25% !important; max-width: 25% !important; padding: 10px 8px; text-align: right; font-weight: ${fontWeight}; color: ${amountColor}; white-space: nowrap; font-family: 'Times New Roman', Times, serif; font-size: ${fontSize}; letter-spacing: 0.3px;">${formatCurrency(item.amount)}</td>
             `;
             analysisTableBody.appendChild(tr);
         });
