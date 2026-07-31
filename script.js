@@ -95,7 +95,14 @@ if (authForm) {
 
             if (error) throw error;
 
-            // Khi đăng nhập thành công, onAuthStateChange sẽ tự động cập nhật UI
+            // Xử lý cập nhật UI trực tiếp khi Đăng nhập thành công
+            if (data && data.session) {
+                currentUserEmail = data.session.user?.email || null;
+                if (authContainer) authContainer.style.display = 'none';
+                if (mainContainer) mainContainer.style.display = 'block';
+                if (btnLogout) btnLogout.style.display = 'block';
+                fetchCustomers();
+            }
         } catch (err) {
             console.error("Lỗi đăng nhập:", err);
             authErrorMsg.innerText = err.message || "Tên đăng nhập hoặc mật khẩu không chính xác.";
@@ -113,6 +120,16 @@ if (btnLogout) {
             try {
                 if (supabaseClient) {
                     await supabaseClient.auth.signOut();
+                    currentUserEmail = null;
+                    if (authContainer) authContainer.style.display = 'flex';
+                    if (mainContainer) mainContainer.style.display = 'none';
+                    if (btnLogout) btnLogout.style.display = 'none';
+                    if (authForm) authForm.reset();
+                    const btnSubmit = document.getElementById('btnAuthSubmit');
+                    if (btnSubmit) {
+                        btnSubmit.innerText = 'Đăng nhập';
+                        btnSubmit.disabled = false;
+                    }
                 }
             } catch (err) {
                 console.error("Lỗi đăng xuất:", err);
@@ -151,11 +168,25 @@ function initAuthListener() {
                 }
             }
         });
+
+        // Kiểm tra phiên đăng nhập hiện tại ngay khi mở trang
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                currentUserEmail = session.user?.email || null;
+                if (authContainer) authContainer.style.display = 'none';
+                if (mainContainer) mainContainer.style.display = 'block';
+                if (btnLogout) btnLogout.style.display = 'block';
+                fetchCustomers();
+            }
+        });
     } else {
         if (authContainer) authContainer.style.display = 'flex';
         if (mainContainer) mainContainer.style.display = 'none';
     }
 }
+
+// TỰ ĐỘNG KÍCH HOẠT LISTENER AUTH KHI SCRIPT TẢI
+initAuthListener();
 
 
 function mapFromSupabase(row) {
@@ -379,6 +410,7 @@ async function fetchCustomers() {
 const form = document.getElementById('customerForm');
 const searchInput = document.getElementById('searchInput');
 const btnClearSearch = document.getElementById('btnClearSearch');
+const filterClassification = document.getElementById('filterClassification');
 const tableBodyElement = document.getElementById('tableBody');
 const paginationContainer = document.getElementById('pagination');
 
