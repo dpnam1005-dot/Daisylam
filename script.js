@@ -213,9 +213,124 @@ function mapToSupabase(c) {
     };
 }
 
+// ========== KPI FUNCTIONS ==========
+const KPI_TARGET = 650000000; // KPI 1 tháng: 650 triệu VNĐ
+
+function getCurrentMonthSales() {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    let monthSales = 0;
+    let hasTxInMonth = false;
+
+    customers.forEach(c => {
+        if (c.history && Array.isArray(c.history) && c.history.length > 0) {
+            c.history.forEach(tx => {
+                const txDate = new Date(tx.date);
+                if (txDate >= start && txDate <= end && tx.amount) {
+                    monthSales += Number(tx.amount);
+                    hasTxInMonth = true;
+                }
+            });
+        }
+    });
+
+    // Nếu chưa có lịch sử giao dịch trong tháng hiện tại, tính các khách hàng được cập nhật/tạo trong tháng này
+    if (!hasTxInMonth) {
+        customers.forEach(c => {
+            const updatedDate = c.lastUpdated ? new Date(c.lastUpdated) : null;
+            if (updatedDate && updatedDate >= start && updatedDate <= end) {
+                monthSales += Number(c.sales || 0);
+            }
+        });
+    }
+
+    return monthSales;
+}
+
+function updateKPIBar() {
+    const kpiValue = document.getElementById('kpiValue');
+    const kpiPercent = document.getElementById('kpiPercent');
+    const kpiProgressFill = document.getElementById('kpiProgressFill');
+
+    if (!kpiValue || !kpiPercent || !kpiProgressFill) return;
+
+    // Tính tổng doanh số phát sinh TRONG THÁNG HIỆN TẠI (chuẩn theo chỉ tiêu tháng)
+    const monthSales = getCurrentMonthSales();
+
+    // Tính phần trăm hoàn thành chỉ tiêu KPI tháng
+    const percentage = (monthSales / KPI_TARGET) * 100;
+    const displayPercentage = Math.round(percentage);
+
+    // Cập nhật hiển thị giá trị doanh số tháng và phần trăm KPI
+    kpiValue.textContent = formatCurrency(monthSales);
+    kpiPercent.textContent = displayPercentage + '%';
+
+    // Cập nhật độ rộng thanh progress bar (tối đa 100%)
+    const barWidth = Math.min(percentage, 100);
+    kpiProgressFill.style.width = barWidth + '%';
+}
+
+// ========== LOADING BAR FUNCTIONS ==========
+function showLoadingBar() {
+    const loadingBar = document.getElementById('loadingBar');
+    const loadingFill = document.querySelector('.loading-progress-fill');
+    const loadingPercent = document.getElementById('loadingPercent');
+
+    if (loadingBar) {
+        loadingBar.style.display = 'flex';
+        loadingFill.style.width = '0%';
+        loadingPercent.textContent = '0%';
+
+        // Simulate progress - chậm hơn để người dùng nhìn thấy
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 8; // Giảm tốc độ tăng
+            if (progress > 85) progress = 85; // Dừng ở 85% đợi data thực
+            loadingFill.style.width = progress + '%';
+            loadingPercent.textContent = Math.round(progress) + '%';
+        }, 150); // Tăng thời gian interval
+
+        loadingBar.dataset.interval = interval;
+        loadingBar.dataset.startTime = Date.now(); // Lưu thời điểm bắt đầu
+    }
+}
+
+async function hideLoadingBar() {
+    const loadingBar = document.getElementById('loadingBar');
+    const loadingFill = document.querySelector('.loading-progress-fill');
+    const loadingPercent = document.getElementById('loadingPercent');
+
+    if (loadingBar) {
+        const interval = loadingBar.dataset.interval;
+        if (interval) clearInterval(parseInt(interval));
+
+        // Đảm bảo loading bar hiển thị ít nhất 1.2 giây
+        const startTime = parseInt(loadingBar.dataset.startTime) || Date.now();
+        const elapsed = Date.now() - startTime;
+        const minDisplayTime = 1200; // 1.2 giây
+        const remainingTime = Math.max(0, minDisplayTime - elapsed);
+
+        // Đợi thời gian còn lại (nếu có)
+        if (remainingTime > 0) {
+            await new Promise(resolve => setTimeout(resolve, remainingTime));
+        }
+
+        // Complete to 100%
+        loadingFill.style.width = '100%';
+        loadingPercent.textContent = '100%';
+
+        setTimeout(() => {
+            loadingBar.style.display = 'none';
+        }, 600); // Giữ ở 100% thêm 0.6s
+    }
+}
+
 async function fetchCustomers() {
     const tableBody = document.getElementById('tableBody');
     try {
+        showLoadingBar(); // Hiện loading bar
         tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang tải dữ liệu từ máy chủ Supabase...</td></tr>`;
 
         if (!supabaseClient) {
@@ -229,6 +344,7 @@ async function fetchCustomers() {
 
         if (error) {
             console.error("Lỗi từ Supabase:", error);
+            await hideLoadingBar(); // Ẩn loading bar khi lỗi (có await)
             tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
                 <b>Lỗi máy chủ:</b> ${error.message} <br>
             </td></tr>`;
@@ -238,6 +354,9 @@ async function fetchCustomers() {
         customers = (data || []).map(mapFromSupabase);
         renderTable();
         updateCategoryDatalist(); // Cập nhật danh sách thể loại
+        updateKPIBar(); // Cập nhật thanh KPI
+
+        await hideLoadingBar(); // Ẩn loading bar khi hoàn thành (có await)
 
         // Khởi tạo custom autocomplete cho tất cả các input
         setTimeout(() => {
@@ -247,15 +366,10 @@ async function fetchCustomers() {
             initCustomAutocomplete('editProductDesc', 'editProductDescDatalist');
             initCustomAutocomplete('salesCategorySelect', 'salesCategoryDatalist');
             initCustomAutocomplete('salesProductDescInput', 'salesProductDescDatalist');
-            
-            // Thêm format số có dấu phẩy cho trường cập nhật doanh số
-            const salesAmountInput = document.getElementById('salesAmountInput');
-            if (salesAmountInput) {
-                salesAmountInput.addEventListener('input', formatInputWithCommas);
-            }
         }, 100);
     } catch (e) {
         console.error("Lỗi hệ thống:", e);
+        await hideLoadingBar(); // Ẩn loading bar khi có lỗi (có await)
         tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
             <b>Lỗi kết nối mạng:</b> ${e.message}
         </td></tr>`;
@@ -264,14 +378,29 @@ async function fetchCustomers() {
 
 const form = document.getElementById('customerForm');
 const searchInput = document.getElementById('searchInput');
+const btnClearSearch = document.getElementById('btnClearSearch');
 const tableBodyElement = document.getElementById('tableBody');
 const paginationContainer = document.getElementById('pagination');
-const filterClassification = document.getElementById('filterClassification');
 
-// Thêm sự kiện tìm kiếm
+// Thêm sự kiện tìm kiếm & nút X xóa nhanh từ khóa
 if (searchInput) {
     searchInput.addEventListener('input', function () {
+        if (btnClearSearch) {
+            btnClearSearch.style.display = this.value.trim() ? 'flex' : 'none';
+        }
         currentPage = 1; // Reset về trang 1 khi tìm kiếm
+        renderTable();
+    });
+}
+
+if (btnClearSearch) {
+    btnClearSearch.addEventListener('click', function () {
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.focus();
+        }
+        this.style.display = 'none';
+        currentPage = 1;
         renderTable();
     });
 }
@@ -295,6 +424,28 @@ const notificationTitle = document.getElementById('notificationTitle');
 const notificationMessage = document.getElementById('notificationMessage');
 
 const idInput = document.getElementById('customerId');
+if (idInput) {
+    idInput.addEventListener('input', function () {
+        const errorEl = document.getElementById('customerIdError');
+        const val = this.value.trim();
+        if (!val) {
+            if (errorEl) errorEl.style.display = 'none';
+            this.style.borderColor = 'var(--border-color)';
+            return;
+        }
+        const exists = customers.some(c => String(c.customerId || '').trim().toLowerCase() === val.toLowerCase());
+        if (exists) {
+            if (errorEl) {
+                errorEl.innerText = `⚠️ Mã khách hàng "${val}" đã tồn tại trên hệ thống!`;
+                errorEl.style.display = 'block';
+            }
+            this.style.borderColor = '#ef4444';
+        } else {
+            if (errorEl) errorEl.style.display = 'none';
+            this.style.borderColor = 'var(--border-color)';
+        }
+    });
+}
 const taxIdInput = document.getElementById('taxId');
 const companyInput = document.getElementById('companyName');
 const classificationInput = document.getElementById('classification');
@@ -312,6 +463,9 @@ const editActions = document.getElementById('editActions');
 const btnCancelEdit = document.getElementById('btnCancelEdit');
 const btnUpdate = document.getElementById('btnUpdate');
 const btnDelete = document.getElementById('btnDelete');
+
+const filterClassification = document.getElementById('filterClassification');
+const reportMonthSelect = document.getElementById('reportMonthSelect');
 
 const fileInputExcel = document.getElementById('fileInputExcel');
 let customerToDelete = null;
@@ -335,6 +489,38 @@ if (salesInput) salesInput.addEventListener('input', formatInputWithCommas);
 if (addSalesInput) addSalesInput.addEventListener('input', formatInputWithCommas);
 
 function formatCurrency(amount) { return Number(amount).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }); }
+
+function formatSalesScaledByMagnitude(amount) {
+    const val = Number(amount) || 0;
+    const formattedText = formatCurrency(val);
+
+    if (val < 0) {
+        return `<span style="color: #ef4444; font-weight: 700; font-size: 13px; font-family: 'DM Sans', -apple-system, sans-serif; font-variant-numeric: tabular-nums;">${formattedText}</span>`;
+    }
+    if (val === 0) {
+        return `<span style="color: #94a3b8; font-weight: 500; font-size: 13px; font-family: 'DM Sans', -apple-system, sans-serif; font-variant-numeric: tabular-nums;">0 ₫</span>`;
+    }
+
+    // Tất cả các số dương dùng chung một cỡ chữ 13px, chỉ phân biệt bằng màu sắc theo mức độ
+    // 1. Hàng Trăm Triệu (>= 100,000,000 đ): Xanh Ngọc Lục Bảo, Đậm 800
+    if (val >= 100000000) {
+        return `<span style="font-size: 13px; font-weight: 800; color: #047857; font-family: 'DM Sans', -apple-system, sans-serif; font-variant-numeric: tabular-nums;">${formattedText}</span>`;
+    }
+
+    // 2. Hàng Chục Triệu (10,000,000 đ đến < 100,000,000 đ): Xanh lá trên 50tr, Cam dưới 50tr
+    if (val >= 10000000) {
+        const color = val >= 50000000 ? '#059669' : '#C2410C';
+        return `<span style="font-size: 13px; font-weight: 700; color: ${color}; font-family: 'DM Sans', -apple-system, sans-serif; font-variant-numeric: tabular-nums;">${formattedText}</span>`;
+    }
+
+    // 3. Hàng Triệu (1,000,000 đ đến < 10,000,000 đ)
+    if (val >= 1000000) {
+        return `<span style="font-size: 13px; font-weight: 600; color: #C2410C; font-family: 'DM Sans', -apple-system, sans-serif; font-variant-numeric: tabular-nums;">${formattedText}</span>`;
+    }
+
+    // 4. Dưới 1 Triệu (< 1,000,000 đ)
+    return `<span style="font-size: 13px; font-weight: 500; color: #64748B; opacity: 0.9; font-family: 'DM Sans', -apple-system, sans-serif; font-variant-numeric: tabular-nums;">${formattedText}</span>`;
+}
 function formatPhoneNumber(phoneVal) {
     if (!phoneVal) return '-';
     let str = phoneVal.toString().trim();
@@ -457,8 +643,11 @@ function formatDateTime(isoString) {
 }
 
 const classificationColors = {
-    "Khách mới": "#3b82f6", "Thường xuyên": "#D4AF37", "Không thường xuyên": "#FC5A8D",
-    "Chưa liên hệ được": "#10b981", "Không nhu cầu": "#ef4444"
+    "Thường xuyên": "#2D5A27",       // Xanh Rêu Đậm (VIP / Giao dịch đều đặn)
+    "Khách mới": "#6B4F3A",          // Nâu Đất Ấm (Khách mới tiềm năng)
+    "Không thường xuyên": "#3B6978", // Xanh Phiến Đá Trầm (Thỉnh thoảng mua)
+    "Chưa liên hệ được": "#D97706",  // Vàng Hổ Phách Nổi Bật (Cần gọi chăm sóc)
+    "Không nhu cầu": "#A23900"       // Đỏ Đất Terracotta (Dừng nhu cầu)
 };
 
 const categoryInput = document.getElementById('category');
@@ -577,6 +766,7 @@ function renderTable() {
         return matchSearch && matchClass;
     });
     filtered.sort((a, b) => b.sales - a.sales);
+    const maxSalesInFiltered = filtered.length > 0 ? (filtered[0].sales || 1) : 1;
     const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
     if (currentPage > totalPages) currentPage = totalPages;
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -589,15 +779,6 @@ function renderTable() {
     }
     paginatedItems.forEach((customer, index) => {
         const tr = document.createElement('tr');
-        
-        // Phân tầng doanh số để dễ nhìn
-        let salesTier = 'low';
-        if (customer.sales >= 200000000) salesTier = 'high';  // >= 200 triệu
-        else if (customer.sales >= 100000000) salesTier = 'medium-high';  // 100-200 triệu
-        else if (customer.sales >= 50000000) salesTier = 'medium';  // 50-100 triệu
-        tr.setAttribute('data-sales-tier', salesTier);
-        
-        let salesColor = customer.sales >= 0 ? '#10b981' : '#ef4444';
         let maKhColor = (customer.classification && classificationColors[customer.classification]) ? classificationColors[customer.classification] : 'var(--primary-color)';
         let maKhTitle = customer.classification ? `Phân loại: ${customer.classification}` : 'Chưa phân loại';
         tr.innerHTML = `
@@ -607,12 +788,13 @@ function renderTable() {
             <td><strong>${customer.companyName || '-'}</strong></td>
             <td class="nowrap">${customer.contactName || '-'}</td>
             <td class="nowrap">${formatPhoneNumber(customer.phone)}</td>
-            <td class="text-right money nowrap" style="color: ${salesColor};">${formatCurrency(customer.sales)}</td>
+            <td class="text-right money nowrap">${formatSalesScaledByMagnitude(customer.sales)}</td>
             <td>${customer.notes || '-'}</td>
         `;
         tableBodyElement.appendChild(tr);
     });
     renderPagination(filtered.length);
+    updateKPIBar(); // Cập nhật thanh KPI mỗi khi render table
 }
 function checkSoftDuplicates(data) {
     let warnings = [];
@@ -634,15 +816,20 @@ async function proceedWithSave(data, isUpdating) {
     if (exists && !isUpdating) {
         if (btnSubmit) { btnSubmit.innerText = 'Lưu Khách Hàng'; btnSubmit.disabled = false; }
 
-        notificationTitle.innerText = "⚠️ Cảnh Báo Trùng Mã Khách Hàng";
-        notificationTitle.style.color = "#d97706";
-        notificationMessage.innerHTML = `Mã khách hàng <strong style="color: #ef4444; font-size: 16px;">"${data.customerId}"</strong> đã tồn tại trên hệ thống!<br><br><span style="color: #64748b; font-size: 13px;">Vui lòng kiểm tra lại danh sách hoặc nhập một Mã KH khác.</span>`;
-        notificationModal.style.display = 'flex';
-
+        const errorEl = document.getElementById('customerIdError');
+        if (errorEl) {
+            errorEl.innerText = `⚠️ Mã khách hàng "${data.customerId}" đã tồn tại trên hệ thống!`;
+            errorEl.style.display = 'block';
+        }
         if (idInput) {
             idInput.style.borderColor = '#ef4444';
             idInput.focus();
         }
+
+        notificationTitle.innerText = "⚠️ Cảnh Báo Trùng Mã Khách Hàng";
+        notificationTitle.style.color = "#d97706";
+        notificationMessage.innerHTML = `Mã khách hàng <strong style="color: #ef4444; font-size: 16px;">"${data.customerId}"</strong> đã tồn tại trên hệ thống!<br><br><span style="color: #64748b; font-size: 13px;">Vui lòng kiểm tra lại danh sách hoặc nhập một Mã KH khác.</span>`;
+        notificationModal.style.display = 'flex';
         return;
     } else {
         if (!isUpdating) {
@@ -715,6 +902,38 @@ document.getElementById('btnAddNewCustomer')?.addEventListener('click', () => {
     openCustomerFormModal('add');
 });
 
+// Thêm sự kiện click tương tác cho GIF Mascot Cute Cổ Vũ Sales
+function showCheerMotivation(title, msg) {
+    if (notificationTitle && notificationMessage && notificationModal) {
+        notificationTitle.innerText = title;
+        notificationTitle.style.color = '#d97706';
+        notificationMessage.innerHTML = msg;
+        notificationModal.style.display = 'flex';
+    }
+}
+
+const cheerQuotes = [
+    { title: "🔥 BÙNG CHÁY HẾT MÌNH!", msg: "<strong style='font-size: 16px; color: #ea580c;'>Quyết tâm cháy hết mình cùng mục tiêu sales tháng này!</strong><br><br><span style='color: #64748b;'>Mọi nỗ lực tư vấn và chăm sóc khách hàng của bạn đều sẽ đem lại quả ngọt rực rỡ! 💪🔥</span>" },
+    { title: "🚀 BỨT PHÁ DOANH SỐ!", msg: "<strong style='font-size: 16px; color: #2563eb;'>Tăng tốc tối đa - Chinh phục mốc KPI 650 TRIỆU!</strong><br><br><span style='color: #64748b;'>Không gì có thể cản bước bạn vươn lên đỉnh cao doanh số! 🚀✨</span>" },
+    { title: "💰 DOANH THU BÙNG NỔ!", msg: "<strong style='font-size: 16px; color: #16a34a;'>Chúc bạn chốt đơn liên tục - Tiền về ngập két!</strong><br><br><span style='color: #64748b;'>Doanh số bùng nổ, hoa hồng ngập tràn, thu nhập đỉnh cao! 💵🎉</span>" },
+    { title: "🏆 QUYẾT THẮNG VÔ ĐỊCH!", msg: "<strong style='font-size: 16px; color: #9333ea;'>Bạn chính là Chiến Binh Sales Xuất Sắc Nhất!</strong><br><br><span style='color: #64748b;'>Giữ vững phong độ và luôn dẫn đầu bảng xếp hạng doanh số nhé! 👑🌟</span>" }
+];
+
+document.getElementById('cheerGifBadge1')?.addEventListener('click', () => {
+    const randomQuote = cheerQuotes[Math.floor(Math.random() * cheerQuotes.length)];
+    showCheerMotivation(randomQuote.title, randomQuote.msg);
+});
+
+document.getElementById('cheerGifBadge2')?.addEventListener('click', () => {
+    const randomQuote = cheerQuotes[Math.floor(Math.random() * cheerQuotes.length)];
+    showCheerMotivation(randomQuote.title, randomQuote.msg);
+});
+
+document.getElementById('cheerGifBadge3')?.addEventListener('click', () => {
+    const randomQuote = cheerQuotes[Math.floor(Math.random() * cheerQuotes.length)];
+    showCheerMotivation(randomQuote.title, randomQuote.msg);
+});
+
 // Thêm sự kiện kiểm tra trùng mã khách hàng khi người dùng nhập
 if (idInput) {
     idInput.addEventListener('input', function () {
@@ -752,7 +971,7 @@ document.getElementById('btnCancelEdit')?.addEventListener('click', function () 
 let currentActionCustomerId = null;
 
 function closeAllModals() {
-    const modalIds = ['customerActionModal', 'editCustomerInfoModal', 'updateSalesModal', 'customerFormModal', 'reportModal', 'analysisModal', 'historyModal', 'duplicateModal', 'deleteModal', 'warningModal', 'notificationModal', 'excelImportModal'];
+    const modalIds = ['customerActionModal', 'editCustomerInfoModal', 'updateSalesModal', 'customerFormModal', 'reportModal', 'analysisModal', 'productAnalysisModal', 'historyModal', 'duplicateModal', 'deleteModal', 'warningModal', 'notificationModal', 'excelImportModal'];
     modalIds.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = 'none';
@@ -1089,53 +1308,111 @@ document.getElementById('btnExportPDF').addEventListener('click', function () {
     pdfMake.createPdf(docDefinition).download('Bang_Xep_Hang_Doanh_So.pdf');
 });
 
-const reportMonthSelect = document.getElementById('reportMonthSelect');
-document.getElementById('btnCloseReport').addEventListener('click', () => { document.getElementById('reportModal').style.display = 'none'; });
+document.getElementById('btnCloseReport')?.addEventListener('click', () => {
+    const reportModal = document.getElementById('reportModal');
+    if (reportModal) reportModal.style.display = 'none';
+});
+
 function populateMonthSelect() {
-    reportMonthSelect.innerHTML = ''; const now = new Date();
+    const reportMonthSelect = document.getElementById('reportMonthSelect');
+    if (!reportMonthSelect) return;
+    reportMonthSelect.innerHTML = '';
+    const now = new Date();
     for (let i = 0; i < 12; i++) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const month = d.getMonth() + 1; const year = d.getFullYear(); const option = document.createElement('option');
-        option.value = `${year}-${month}`; option.text = i === 0 ? `Tháng ${month}/${year} (Tháng này)` : `Tháng ${month}/${year}`;
+        const month = d.getMonth() + 1;
+        const year = d.getFullYear();
+        const option = document.createElement('option');
+        option.value = `${year}-${month}`;
+        option.text = i === 0 ? `Tháng ${month}/${year} (Tháng này)` : `Tháng ${month}/${year}`;
         reportMonthSelect.appendChild(option);
     }
 }
+
 function showRevenueReport() {
-    const selectedValue = reportMonthSelect.value; let year, monthIndex, monthLabel;
-    if (selectedValue) { const parts = selectedValue.split('-'); year = parseInt(parts[0], 10); monthIndex = parseInt(parts[1], 10) - 1; monthLabel = `${monthIndex + 1}/${year}`; }
-    else { const now = new Date(); year = now.getFullYear(); monthIndex = now.getMonth(); monthLabel = `${monthIndex + 1}/${year}`; }
-    let start = new Date(year, monthIndex, 1); start.setHours(0, 0, 0, 0); let end = new Date(year, monthIndex + 1, 0); end.setHours(23, 59, 59, 999);
-    let totalRevenuePeriod = 0; let transactionsInPeriod = [];
-    customers.forEach(c => {
-        if (c.history && c.history.length > 0) {
-            c.history.forEach(tx => {
-                const txDate = new Date(tx.date);
-                if (txDate >= start && txDate <= end && tx.amount !== 0) transactionsInPeriod.push({ customer: c, tx: tx, date: txDate });
-            });
-        }
-    });
-    transactionsInPeriod.sort((a, b) => b.date - a.date);
-    const reportTableBody = document.getElementById('reportTableBody'); reportTableBody.innerHTML = '';
-    if (transactionsInPeriod.length === 0) {
-        reportTableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 30px; color: #64748b;">Không có giao dịch/biến động doanh thu nào phát sinh trong <strong>Tháng ${monthLabel}</strong>.</td></tr>`;
-        document.getElementById('reportTotalRevenue').innerText = "0 đ"; document.getElementById('reportTotalRevenue').style.color = "#64748b";
-    } else {
-        transactionsInPeriod.forEach(item => {
-            const c = item.customer; const tx = item.tx;
-            const formattedTime = item.date.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            totalRevenuePeriod += tx.amount; let amountColor = tx.amount > 0 ? '#10b981' : '#ef4444';
-            const tr = document.createElement('tr');
-            tr.style.cursor = 'pointer';
-            tr.onclick = () => { if (c && c.customerId) showCustomerActionModal(c.customerId); };
-            tr.innerHTML = `<td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px; text-align: center;">${formattedTime}</td><td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: var(--primary-color);" class="customer-id-cell" title="Click để thao tác">${c.customerId || '-'}</td><td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${c.companyName || '-'}</td><td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; color: ${amountColor}; font-weight: bold;">${formatCurrency(tx.amount)}</td><td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px;">${tx.note || '-'}</td>`;
-            reportTableBody.appendChild(tr);
-        });
-        document.getElementById('reportTotalRevenue').innerText = formatCurrency(totalRevenuePeriod); document.getElementById('reportTotalRevenue').style.color = totalRevenuePeriod >= 0 ? "#10b981" : "#ef4444";
+    const reportMonthSelect = document.getElementById('reportMonthSelect');
+    if (!reportMonthSelect) return;
+
+    if (!reportMonthSelect.options || reportMonthSelect.options.length === 0) {
+        populateMonthSelect();
     }
-    document.getElementById('reportModal').style.display = 'flex';
+
+    const selectedValue = reportMonthSelect.value;
+    let year, monthIndex, monthLabel;
+    if (selectedValue && selectedValue.includes('-')) {
+        const parts = selectedValue.split('-');
+        year = parseInt(parts[0], 10);
+        monthIndex = parseInt(parts[1], 10) - 1;
+        monthLabel = `${monthIndex + 1}/${year}`;
+    } else {
+        const now = new Date();
+        year = now.getFullYear();
+        monthIndex = now.getMonth();
+        monthLabel = `${monthIndex + 1}/${year}`;
+    }
+
+    let start = new Date(year, monthIndex, 1); start.setHours(0, 0, 0, 0);
+    let end = new Date(year, monthIndex + 1, 0); end.setHours(23, 59, 59, 999);
+
+    let totalRevenuePeriod = 0;
+    let transactionsInPeriod = [];
+
+    if (Array.isArray(customers)) {
+        customers.forEach(c => {
+            if (c.history && Array.isArray(c.history) && c.history.length > 0) {
+                c.history.forEach(tx => {
+                    if (tx.date) {
+                        const txDate = new Date(tx.date);
+                        if (txDate >= start && txDate <= end && tx.amount !== 0) {
+                            transactionsInPeriod.push({ customer: c, tx: tx, date: txDate });
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    transactionsInPeriod.sort((a, b) => b.date - a.date);
+
+    const reportTableBody = document.getElementById('reportTableBody');
+    if (reportTableBody) {
+        reportTableBody.innerHTML = '';
+        if (transactionsInPeriod.length === 0) {
+            reportTableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 30px; color: #64748b;">Không có giao dịch/biến động doanh thu nào phát sinh trong <strong>Tháng ${monthLabel}</strong>.</td></tr>`;
+            const reportTotalEl = document.getElementById('reportTotalRevenue');
+            if (reportTotalEl) {
+                reportTotalEl.innerText = "0 đ";
+                reportTotalEl.style.color = "#64748b";
+            }
+        } else {
+            transactionsInPeriod.forEach(item => {
+                const c = item.customer;
+                const tx = item.tx;
+                const formattedTime = item.date.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                totalRevenuePeriod += Number(tx.amount || 0);
+                const tr = document.createElement('tr');
+                tr.style.cursor = 'pointer';
+                tr.onclick = () => { if (c && c.customerId) showCustomerActionModal(c.customerId); };
+                tr.innerHTML = `<td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px; text-align: center;">${formattedTime}</td><td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: var(--primary-color);" class="customer-id-cell" title="Click để thao tác">${c.customerId || '-'}</td><td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${c.companyName || '-'}</td><td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; white-space: nowrap;">${formatSalesScaledByMagnitude(tx.amount)}</td><td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px;">${tx.note || '-'}</td>`;
+                reportTableBody.appendChild(tr);
+            });
+            const reportTotalEl = document.getElementById('reportTotalRevenue');
+            if (reportTotalEl) {
+                reportTotalEl.innerText = formatCurrency(totalRevenuePeriod);
+                reportTotalEl.style.color = totalRevenuePeriod >= 0 ? "#10b981" : "#ef4444";
+            }
+        }
+    }
+
+    const reportModal = document.getElementById('reportModal');
+    if (reportModal) reportModal.style.display = 'flex';
 }
-reportMonthSelect.addEventListener('change', showRevenueReport);
-document.getElementById('btnReportMonth').addEventListener('click', () => { populateMonthSelect(); showRevenueReport(); });
+
+document.getElementById('reportMonthSelect')?.addEventListener('change', showRevenueReport);
+document.getElementById('btnReportMonth')?.addEventListener('click', () => {
+    populateMonthSelect();
+    showRevenueReport();
+});
 
 let chartClassificationInstance = null;
 let chartTopCustomersInstance = null;
@@ -1335,34 +1612,9 @@ function showAnalysisModal() {
             tr.style.borderBottom = '1px solid #e2e8f0';
             tr.style.cursor = 'pointer';
             tr.onclick = () => { if (item && item.customerId) showCustomerActionModal(item.customerId); };
-            
-            // Phân tầng doanh số để dễ nhìn (giống bảng chính)
-            let amountColor = '#10b981';
-            let fontSize = '15px';
-            let fontWeight = '600';
-            if (item.amount < 0) {
-                amountColor = '#ef4444';
-            } else if (item.amount >= 200000000) {  // >= 200 triệu
-                amountColor = '#047857';
-                fontSize = '17px';
-                fontWeight = '800';
-            } else if (item.amount >= 100000000) {  // 100-200 triệu
-                amountColor = '#059669';
-                fontSize = '16px';
-                fontWeight = '700';
-            } else if (item.amount >= 50000000) {  // 50-100 triệu
-                amountColor = '#10B981';
-                fontSize = '15px';
-                fontWeight = '700';
-            } else {  // < 50 triệu
-                amountColor = '#D97706';
-                fontSize = '15px';
-                fontWeight = '600';
-            }
-            
             tr.innerHTML = `
                 <td style="width: 75% !important; max-width: 75% !important; padding: 10px 8px; font-weight: bold; color: var(--primary-color); text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="customer-id-cell" title="Click để thao tác">${item.customerId}</td>
-                <td style="width: 25% !important; max-width: 25% !important; padding: 10px 8px; text-align: right; font-weight: ${fontWeight}; color: ${amountColor}; white-space: nowrap; font-family: 'Times New Roman', Times, serif; font-size: ${fontSize}; letter-spacing: 0.3px;">${formatCurrency(item.amount)}</td>
+                <td style="width: 25% !important; max-width: 25% !important; padding: 10px 8px; text-align: right; white-space: nowrap;">${formatSalesScaledByMagnitude(item.amount)}</td>
             `;
             analysisTableBody.appendChild(tr);
         });

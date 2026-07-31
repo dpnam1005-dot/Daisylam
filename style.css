@@ -29,7 +29,8 @@ body { background-color: var(--bg-color); color: var(--text-main); padding: 20px
 .header-left {
     display: flex;
     align-items: center;
-    gap: 0px;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 .logo-title {
     color: var(--primary-color);
@@ -132,8 +133,49 @@ body { background-color: var(--bg-color); color: var(--text-main); padding: 20px
 .edit-actions { display: none; gap: 10px; }
 .table-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
 .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.search-box { padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 8px; width: 250px; background: #FDFBF8; font-size: 14px; }
-.search-box:focus { outline: none; border-color: var(--primary-color); }
+.search-box-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+.search-box {
+    padding: 8px 30px 8px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    width: 250px;
+    background: #FDFBF8;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+.search-box:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(60, 74, 52, 0.1);
+    background: #FFFFFF;
+}
+.search-clear-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    color: #94a3b8;
+    width: 20px;
+    height: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    user-select: none;
+    line-height: 1;
+}
+.search-clear-btn:hover {
+    color: #ef4444;
+    background: #fee2e2;
+}
 .table-container { overflow-x: auto; }
 table { width: 100%; min-width: 1200px; border-collapse: collapse; }
 th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; vertical-align: middle; }
@@ -144,41 +186,7 @@ th { background-color: #F5EFE8; color: var(--text-muted); font-weight: 600; text
 tbody tr:hover { background-color: #F8F3ED; cursor: pointer; }
 .text-right { text-align: right; }
 .text-center { text-align: center; }
-.money { 
-    color: #3C4A34; 
-    font-weight: 700;
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 16px;
-    letter-spacing: 0.3px;
-}
-/* Phân màu theo mức doanh số để dễ nhìn */
-.money[data-amount]:has([data-amount]) {
-    font-size: 17px;
-}
-/* Doanh số >= 200 triệu - Màu xanh đậm */
-tr[data-sales-tier="high"] .money {
-    color: #047857;
-    font-weight: 800;
-    font-size: 17px;
-}
-/* Doanh số 100-200 triệu - Màu xanh vừa */
-tr[data-sales-tier="medium-high"] .money {
-    color: #059669;
-    font-weight: 700;
-    font-size: 16px;
-}
-/* Doanh số 50-100 triệu - Màu xanh nhạt */
-tr[data-sales-tier="medium"] .money {
-    color: #10B981;
-    font-weight: 700;
-    font-size: 15px;
-}
-/* Doanh số < 50 triệu - Màu cam/nâu */
-tr[data-sales-tier="low"] .money {
-    color: #D97706;
-    font-weight: 600;
-    font-size: 15px;
-}
+.money { color: #3C4A34; font-weight: 700; }
 .pagination-container { display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 5px; }
 .page-btn { padding: 6px 12px; border: 1px solid var(--border-color); background: white; color: var(--text-main); border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
 .page-btn:hover:not(.active):not(:disabled) { background: #F5EFE8; }
@@ -366,16 +374,6 @@ tr[data-sales-tier="low"] .money {
 .form-control-custom::placeholder {
     color: #A49B8E;
 }
-
-/* Định dạng số cho trường cập nhật doanh số */
-#salesAmountInput {
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 15px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
 .btn-submit-custom {
     width: 100%;
     background-color: #1B362B;
@@ -580,12 +578,12 @@ input[list]::-webkit-calendar-picker-indicator {
 
 .custom-autocomplete-item:hover,
 .custom-autocomplete-item.selected {
-    background: #F3F4F6;
-    color: #111827;
+    background: #F5EFE8;
+    color: var(--primary-color);
 }
 
 .custom-autocomplete-item:active {
-    background: #E5E7EB;
+    background: #EFE8DF;
 }
 
 .custom-autocomplete-dropdown::-webkit-scrollbar {
@@ -593,17 +591,17 @@ input[list]::-webkit-calendar-picker-indicator {
 }
 
 .custom-autocomplete-dropdown::-webkit-scrollbar-track {
-    background: #F9FAFB;
+    background: #F8F4EF;
     border-radius: 4px;
 }
 
 .custom-autocomplete-dropdown::-webkit-scrollbar-thumb {
-    background: #D1D5DB;
+    background: var(--accent-warm);
     border-radius: 4px;
 }
 
 .custom-autocomplete-dropdown::-webkit-scrollbar-thumb:hover {
-    background: #9CA3AF;
+    background: var(--accent-terracotta);
 }
 
 .custom-autocomplete-empty {
@@ -623,3 +621,194 @@ input[list]::-webkit-calendar-picker-indicator {
 }
 
 
+
+
+
+
+
+/* KPI Progress Bar - Compact Modern Inline UI (Khớp chiều cao với nút Bảng Xếp Hạng Doanh Số) */
+.kpi-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 14px;
+    background: #FFFFFF;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(60, 74, 52, 0.04);
+    height: 38px;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.kpi-bar-container:hover {
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.12);
+    border-color: #FCD34D;
+}
+
+.kpi-left-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.kpi-title {
+    font-size: 10px;
+    font-weight: 800;
+    color: #64748B;
+    letter-spacing: 0.5px;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    text-transform: uppercase;
+}
+
+.kpi-percent {
+    font-size: 12.5px;
+    font-weight: 900;
+    color: #B45309;
+    background: #FEF3C7;
+    padding: 1px 7px;
+    border-radius: 6px;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    border: 1px solid #FDE68A;
+}
+
+.kpi-progress-bar {
+    width: 130px;
+    height: 8px;
+    background: #E2E8F0;
+    border-radius: 10px;
+    overflow: visible;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.kpi-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #D97706 0%, #F59E0B 50%, #EAB308 100%);
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
+}
+
+.kpi-target-marker {
+    position: absolute;
+    right: 0;
+    top: -11px;
+    bottom: -4px;
+    width: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+}
+
+.kpi-target-label {
+    font-size: 9px;
+    font-weight: 900;
+    color: #FFFFFF;
+    background: #B45309;
+    padding: 0 4px;
+    border-radius: 3px;
+    white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(180, 83, 9, 0.3);
+    line-height: 1.3;
+}
+
+.kpi-target-line {
+    width: 2px;
+    height: 100%;
+    background: #B45309;
+    border-radius: 1px;
+}
+
+.kpi-right-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.kpi-value {
+    font-size: 14px;
+    font-weight: 900;
+    color: #0F172A;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    letter-spacing: -0.2px;
+}
+
+.kpi-target-sub {
+    font-size: 12px;
+    color: #1E293B;
+    font-weight: 800;
+}
+
+/* Header right alignment */
+.header-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/* GIF Cute Mascot Cổ Vũ Sales */
+.sales-cheer-gif-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sales-cheer-gif-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 12px 3px 6px;
+    background: #FFFFFF;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(60, 74, 52, 0.04);
+    height: 38px;
+    box-sizing: border-box;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sales-cheer-gif-container:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(217, 119, 6, 0.15);
+    border-color: #FCD34D;
+}
+
+.sales-cheer-gif {
+    height: 30px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 6px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+    animation: mascotContinuousDance 2.2s ease-in-out infinite;
+}
+
+@keyframes mascotContinuousDance {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg) scale(1);
+    }
+    25% {
+        transform: translateY(-4px) rotate(-8deg) scale(1.08);
+    }
+    50% {
+        transform: translateY(0) rotate(0deg) scale(1);
+    }
+    75% {
+        transform: translateY(-4px) rotate(8deg) scale(1.08);
+    }
+}
+
+.sales-cheer-gif-text {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    color: #C2410C;
+    white-space: nowrap;
+}
