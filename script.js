@@ -496,7 +496,6 @@ const btnCancelEdit = document.getElementById('btnCancelEdit');
 const btnUpdate = document.getElementById('btnUpdate');
 const btnDelete = document.getElementById('btnDelete');
 
-const filterClassification = document.getElementById('filterClassification');
 const reportMonthSelect = document.getElementById('reportMonthSelect');
 
 const fileInputExcel = document.getElementById('fileInputExcel');
@@ -770,6 +769,8 @@ function toggleEditMode(editing) {
 }
 
 function renderPagination(totalItems) {
+    const paginationContainer = document.getElementById('pagination');
+    if (!paginationContainer) return;
     paginationContainer.innerHTML = '';
     const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
     if (totalPages <= 1) return;
@@ -789,7 +790,15 @@ function renderPagination(totalItems) {
 }
 
 function renderTable() {
-    const query = searchInput.value.toLowerCase(); const filterClassVal = filterClassification ? filterClassification.value : '';
+    const searchInput = document.getElementById('searchInput');
+    const filterClassification = document.getElementById('filterClassification');
+    const tableBodyElement = document.getElementById('tableBody');
+    const paginationContainer = document.getElementById('pagination');
+
+    if (!tableBodyElement) return;
+
+    const query = searchInput ? searchInput.value.toLowerCase() : ''; 
+    const filterClassVal = filterClassification ? filterClassification.value : '';
     let filtered = customers.filter(c => {
         const matchSearch = String(c.customerId || '').toLowerCase().includes(query) || (c.companyName && String(c.companyName).toLowerCase().includes(query)) ||
             (c.taxId && String(c.taxId).toLowerCase().includes(query)) || (c.contactName && String(c.contactName).toLowerCase().includes(query)) ||
@@ -807,7 +816,8 @@ function renderTable() {
     tableBodyElement.innerHTML = '';
     if (paginatedItems.length === 0) {
         tableBodyElement.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #94a3b8; padding: 30px;">Không có dữ liệu.</td></tr>`;
-        paginationContainer.innerHTML = ''; return;
+        if (paginationContainer) paginationContainer.innerHTML = ''; 
+        return;
     }
     paginatedItems.forEach((customer, index) => {
         const tr = document.createElement('tr');
