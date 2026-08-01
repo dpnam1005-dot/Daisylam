@@ -253,26 +253,18 @@ function getCurrentMonthSales() {
     const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
 
     let monthSales = 0;
-    let hasTxInMonth = false;
 
-    customers.forEach(c => {
-        if (c.history && Array.isArray(c.history) && c.history.length > 0) {
-            c.history.forEach(tx => {
-                const txDate = new Date(tx.date);
-                if (txDate >= start && txDate <= end && tx.amount) {
-                    monthSales += Number(tx.amount);
-                    hasTxInMonth = true;
-                }
-            });
-        }
-    });
-
-    // Nếu chưa có lịch sử giao dịch trong tháng hiện tại, tính các khách hàng được cập nhật/tạo trong tháng này
-    if (!hasTxInMonth) {
+    if (Array.isArray(customers)) {
         customers.forEach(c => {
-            const updatedDate = c.lastUpdated ? new Date(c.lastUpdated) : null;
-            if (updatedDate && updatedDate >= start && updatedDate <= end) {
-                monthSales += Number(c.sales || 0);
+            if (c.history && Array.isArray(c.history) && c.history.length > 0) {
+                c.history.forEach(tx => {
+                    if (tx.date) {
+                        const txDate = new Date(tx.date);
+                        if (txDate >= start && txDate <= end && tx.amount) {
+                            monthSales += Number(tx.amount || 0);
+                        }
+                    }
+                });
             }
         });
     }
@@ -302,6 +294,16 @@ function updateKPIBar() {
     const barWidth = Math.min(percentage, 100);
     kpiProgressFill.style.width = barWidth + '%';
 }
+
+document.getElementById('kpiCatRunner')?.addEventListener('click', () => {
+    const monthSales = getCurrentMonthSales();
+    const pct = Math.round((monthSales / KPI_TARGET) * 100);
+    let msg = `🐾 Mochi nhắn: "Cố lên bạn ơi! Mochi đang chạy đua để cùng bạn đạt mốc KPI 650M tháng này! Hiện tại đã chạy được ${pct}% rồi nè! 🚀🔥"`;
+    if (pct >= 100) {
+        msg = `🎉 Mochi nhắn: "XUẤT SẮC QUÁ! Bạn đã đưa Mochi chạy cán đích 100% chỉ tiêu KPI 650M rồi! Thật tự hào! 🥳💰"`;
+    }
+    showNotification("Mochi Cổ Vũ KPI 🐾", msg);
+});
 
 // ========== LOADING BAR FUNCTIONS ==========
 function showLoadingBar() {
@@ -524,33 +526,30 @@ function formatCurrency(amount) { return Number(amount).toLocaleString('vi-VN', 
 function formatSalesScaledByMagnitude(amount) {
     const val = Number(amount) || 0;
     const formattedText = formatCurrency(val);
+    const monoStyle = "font-family: 'Roboto Mono', 'SFMono-Regular', Consolas, 'Courier New', monospace; font-variant-numeric: tabular-nums lining-nums;";
 
     if (val < 0) {
-        return `<span style="color: #ef4444; font-weight: 700; font-size: 13px; font-family: 'DM Sans', -apple-system, sans-serif; font-variant-numeric: tabular-nums;">${formattedText}</span>`;
+        return `<span style="color: #ef4444; font-weight: 700; font-size: 13.5px; ${monoStyle}">${formattedText}</span>`;
     }
     if (val === 0) {
-        return `<span style="color: #94a3b8; font-weight: 500; font-size: 13px; font-family: 'DM Sans', -apple-system, sans-serif; font-variant-numeric: tabular-nums;">0 ₫</span>`;
+        return `<span style="color: #94a3b8; font-weight: 500; font-size: 13.5px; ${monoStyle}">0 ₫</span>`;
     }
 
-    // Tất cả các số dương dùng chung một cỡ chữ 13px, chỉ phân biệt bằng màu sắc theo mức độ
-    // 1. Hàng Trăm Triệu (>= 100,000,000 đ): Xanh Ngọc Lục Bảo, Đậm 800
+    // Tất cả các số dùng font monospaced Roboto Mono / Consolas để 100% chữ số có độ rộng bằng nhau tăm tắp
     if (val >= 100000000) {
-        return `<span style="font-size: 13px; font-weight: 800; color: #047857; font-family: 'DM Sans', -apple-system, sans-serif; font-variant-numeric: tabular-nums;">${formattedText}</span>`;
+        return `<span style="font-size: 13.5px; font-weight: 800; color: #047857; ${monoStyle}">${formattedText}</span>`;
     }
 
-    // 2. Hàng Chục Triệu (10,000,000 đ đến < 100,000,000 đ): Xanh lá trên 50tr, Cam dưới 50tr
     if (val >= 10000000) {
         const color = val >= 50000000 ? '#059669' : '#C2410C';
-        return `<span style="font-size: 13px; font-weight: 700; color: ${color}; font-family: 'DM Sans', -apple-system, sans-serif; font-variant-numeric: tabular-nums;">${formattedText}</span>`;
+        return `<span style="font-size: 13.5px; font-weight: 700; color: ${color}; ${monoStyle}">${formattedText}</span>`;
     }
 
-    // 3. Hàng Triệu (1,000,000 đ đến < 10,000,000 đ)
     if (val >= 1000000) {
-        return `<span style="font-size: 13px; font-weight: 600; color: #C2410C; font-family: 'DM Sans', -apple-system, sans-serif; font-variant-numeric: tabular-nums;">${formattedText}</span>`;
+        return `<span style="font-size: 13.5px; font-weight: 600; color: #C2410C; ${monoStyle}">${formattedText}</span>`;
     }
 
-    // 4. Dưới 1 Triệu (< 1,000,000 đ)
-    return `<span style="font-size: 13px; font-weight: 500; color: #64748B; opacity: 0.9; font-family: 'DM Sans', -apple-system, sans-serif; font-variant-numeric: tabular-nums;">${formattedText}</span>`;
+    return `<span style="font-size: 13.5px; font-weight: 600; color: #475569; ${monoStyle}">${formattedText}</span>`;
 }
 function formatPhoneNumber(phoneVal) {
     if (!phoneVal) return '-';

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700;800&display=swap');
+
 /* CSS Hệ thống - Florenté Warm Natural Aesthetic */
 :root {
     --primary-color: #3C4A34; /* Xanh rêu Florenté */
@@ -11,6 +13,29 @@
     --accent-terracotta: #A67B5B;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+/* Áp dụng Font Roboto Mono (Monospaced Numbers) giúp tất cả chữ số có ĐỘ RỘNG BẰNG NHAU 100% (Số 1 rộng bằng số 5, số 8, số 0) */
+.sf-pro-num,
+.inter-num,
+.mono-num,
+.kpi-value,
+.kpi-percent,
+.kpi-target-sub,
+#reportTotalRevenue,
+#salesAmountInput,
+#editSalesDisplay,
+#sales,
+.amount-text,
+.table-sales-val,
+.sales-cheer-gif-text,
+#salesTable td:nth-child(4),
+#salesTable td:nth-child(2) {
+    font-family: 'Roboto Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
+    font-weight: 700 !important;
+    font-variant-numeric: tabular-nums lining-nums !important;
+    letter-spacing: -0.5px;
+}
+
 body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; line-height: 1.5; }
 .container { max-width: 1600px; width: 98%; margin: 0 auto; }
 
@@ -693,36 +718,91 @@ input[list]::-webkit-calendar-picker-indicator {
     box-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
 }
 
-.kpi-target-marker {
+/* Con mèo Mochi chạy động trên thanh progress */
+.kpi-cat-runner {
     position: absolute;
-    right: 0;
-    top: -11px;
-    bottom: -4px;
-    width: 2px;
+    right: -13px;
+    top: -20px;
+    width: 28px;
+    height: 24px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    z-index: 2;
+    justify-content: center;
+    z-index: 10;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.kpi-target-label {
-    font-size: 9px;
-    font-weight: 900;
-    color: #FFFFFF;
-    background: #B45309;
-    padding: 0 4px;
-    border-radius: 3px;
+.kpi-cat-runner:hover {
+    transform: scale(1.35) translateY(-3px);
+}
+
+/* Bóng thoại động Mochi nhắn "Hiếu Hạnh cố lên nhé" */
+.kpi-cat-speech {
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-6px) scale(0.85);
+    background: #FFFFFF;
+    color: #1B362B;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 12px;
     white-space: nowrap;
-    box-shadow: 0 1px 4px rgba(180, 83, 9, 0.3);
-    line-height: 1.3;
+    box-shadow: 0 4px 14px rgba(27, 54, 43, 0.22);
+    border: 1.5px solid #F59E0B;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 100;
+    font-family: 'DM Sans', -apple-system, sans-serif;
 }
 
-.kpi-target-line {
-    width: 2px;
-    height: 100%;
-    background: #B45309;
-    border-radius: 1px;
+.kpi-cat-speech::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 5px 6px 5px;
+    border-style: solid;
+    border-color: transparent transparent #F59E0B transparent;
 }
+
+.kpi-cat-speech.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.kpi-cat-img {
+    width: 26px;
+    height: 24px;
+    object-fit: contain;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+    animation: catRunContinuous 0.5s ease-in-out infinite;
+}
+
+@keyframes catRunContinuous {
+    0% {
+        transform: translateY(0) rotate(-4deg);
+    }
+    25% {
+        transform: translateY(-3px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(0) rotate(4deg);
+    }
+    75% {
+        transform: translateY(-3px) rotate(0deg);
+    }
+    100% {
+        transform: translateY(0) rotate(-4deg);
+    }
+}
+
+
 
 .kpi-right-group {
     display: flex;
@@ -812,3 +892,89 @@ input[list]::-webkit-calendar-picker-indicator {
     color: #C2410C;
     white-space: nowrap;
 }
+
+.icon-bg-red {
+    background: #FEF2F2;
+}
+
+.text-red {
+    color: #DC2626;
+}
+
+/* Modal Chúc Mừng Mốc 50% KPI */
+.kpi-milestone-content {
+    max-width: 480px;
+    text-align: center;
+    padding: 32px 24px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FFFBEB 100%);
+    border-radius: 20px;
+    border: 2px solid #FCD34D;
+    box-shadow: 0 20px 40px rgba(217, 119, 6, 0.25);
+    animation: milestonePopIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes milestonePopIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.7) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.kpi-milestone-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: linear-gradient(90deg, #D97706, #F59E0B);
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 900;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+    margin-bottom: 16px;
+}
+
+.kpi-milestone-mochi {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.kpi-mochi-gif {
+    height: 75px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15));
+    animation: mochiCelebrationDance 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes mochiCelebrationDance {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        transform: translateY(-8px) scale(1.08);
+    }
+}
+
+.kpi-milestone-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #1B362B;
+    margin: 0 0 12px 0;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+}
+
+.kpi-milestone-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #475569;
+    margin: 0;
+}
+
+
