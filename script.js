@@ -252,13 +252,24 @@ function mapFromSupabase(row) {
     } else if (Array.isArray(row.history)) {
         parsedHistory = row.history;
     }
+
+    const topCategory = row.product_name || '';
+    const topProductDesc = row.product_description || '';
+
+    // Tự động đồng bộ tên sản phẩm & mô tả sản phẩm mới nhất sửa từ Supabase DB vào mảng lịch sử
+    parsedHistory = (parsedHistory || []).map(tx => ({
+        ...tx,
+        category: tx.category || topCategory,
+        productDesc: tx.productDesc || topProductDesc
+    }));
+
     return {
         customerId: row.customer_id || '',
         taxId: row.tax_id || '',
         companyName: row.company_name || '',
         classification: row.classification || '',
-        category: row.product_name || '',
-        productDesc: row.product_description || '',
+        category: topCategory,
+        productDesc: topProductDesc,
         contactName: row.contact_name || '',
         phone: row.phone || '',
         sales: Number(row.sales) || 0,
@@ -796,10 +807,13 @@ function showHistoryModal(customerId) {
                 const amountPrefix = item.amount > 0 ? '+' : '';
                 detailsHtml += `<li>Biến động doanh số: <strong style="color: ${item.amount > 0 ? '#10b981' : '#ef4444'}">${amountPrefix}${formatCurrency(item.amount)}</strong></li>`;
             }
-            const categoryText = item.category ? `<strong style="color: var(--primary-color);">${item.category}</strong>` : '<span style="color: #94a3b8;">-</span>';
+            const finalCategory = item.category || customer.category || '';
+            const finalProductDesc = item.productDesc || customer.productDesc || '';
+
+            const categoryText = finalCategory ? `<strong style="color: var(--primary-color);">${finalCategory}</strong>` : '<span style="color: #94a3b8;">-</span>';
             detailsHtml += `<li>Tên sản phẩm: ${categoryText}</li>`;
 
-            const productDescText = item.productDesc ? `<span style="color: #64748b;">${item.productDesc}</span>` : '<span style="color: #94a3b8;">-</span>';
+            const productDescText = finalProductDesc ? `<span style="color: #64748b;">${finalProductDesc}</span>` : '<span style="color: #94a3b8;">-</span>';
             detailsHtml += `<li>Mô tả: ${productDescText}</li>`;
             detailsHtml += `</ul>`;
 
@@ -1842,7 +1856,7 @@ function showProductAnalysisModal() {
             c.history.forEach(tx => {
                 const txDate = new Date(tx.date);
                 if (txDate >= start && txDate <= end && tx.amount !== 0) {
-                    const productName = tx.category || 'Không rõ';
+                    const productName = tx.category || c.category || 'Không rõ';
 
                     if (!productStats[productName]) {
                         productStats[productName] = {
