@@ -977,4 +977,25 @@ input[list]::-webkit-calendar-picker-indicator {
     margin: 0;
 }
 
+/* Color Badges & Classes Phân Loại Khách Hàng */
+.color-khach-moi { color: #2563EB !important; }
+.color-thuong-xuyen { color: #16A34A !important; }
+.color-khong-thuong-xuyen { color: #F97316 !important; }
+.color-chua-lien-he { color: #D97706 !important; }
+.color-khong-nhu-cau { color: #DC2626 !important; }
+
+.badge-classification {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 6px;
+    letter-spacing: 0.2px;
+}
+.badge-khach-moi { background-color: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+.badge-thuong-xuyen { background-color: #F0FDF4; color: #16A34A; border: 1px solid #BBF7D0; }
+.badge-khong-thuong-xuyen { background-color: #FFF7ED; color: #F97316; border: 1px solid #FED7AA; }
+.badge-chua-lien-he { background-color: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+.badge-khong-nhu-cau { background-color: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+
 

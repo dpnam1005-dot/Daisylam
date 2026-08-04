@@ -51,6 +51,28 @@ try {
 }
 
 let customers = [];
+const classificationColors = {
+    "Khách mới": "#2563EB",            // màu xanh dương - #2563EB
+    "Thường xuyên": "#16A34A",         // màu xanh lá - #16A34A
+    "Không thường xuyên": "#F97316",    // màu cam - #F97316
+    "Chưa liên hệ được": "#D97706",    // màu vàng - #D97706
+    "Không nhu cầu": "#DC2626",          // màu đỏ - #DC2626
+    "Chưa phân loại": "#64748B"
+};
+
+function showNotification(title, msg, titleColor = '#d97706') {
+    const titleEl = document.getElementById('notificationTitle');
+    const msgEl = document.getElementById('notificationMessage');
+    const modalEl = document.getElementById('notificationModal');
+    if (titleEl && msgEl && modalEl) {
+        titleEl.innerText = title;
+        titleEl.style.color = titleColor;
+        msgEl.innerHTML = msg;
+        modalEl.style.display = 'flex';
+    }
+}
+window.showNotification = showNotification;
+
 let currentUserEmail = null;
 let isEditing = false;
 let pendingCustomerData = null;
@@ -72,17 +94,25 @@ const btnLogout = document.getElementById('btnLogout');
 if (authForm) {
     authForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        const id = authId.value.trim();
-        const password = authPassword.value;
+        const id = authId ? authId.value.trim() : '';
+        const password = authPassword ? authPassword.value.trim() : '';
         const btnSubmit = document.getElementById('btnAuthSubmit');
 
-        btnSubmit.innerText = 'Đang đăng nhập...';
-        btnSubmit.disabled = true;
+        if (!id || !password) {
+            authErrorMsg.innerText = "Vui lòng nhập đầy đủ ID Đăng nhập và Mật khẩu!";
+            authErrorMsg.style.display = 'block';
+            return;
+        }
+
+        if (btnSubmit) {
+            btnSubmit.innerText = 'Đang đăng nhập...';
+            btnSubmit.disabled = true;
+        }
         authErrorMsg.style.display = 'none';
 
         try {
             if (!supabaseClient) {
-                throw new Error("Không có kết nối đến cơ sở dữ liệu Supabase.");
+                throw new Error("Không có kết nối đến cơ sở dữ liệu Supabase. Vui lòng kiểm tra mạng hoặc DNS!");
             }
 
             // Tự động map ID thành định dạng Email cho Supabase Auth (ví dụ: hieuhanh -> hieuhanh@daisylam.id.vn)
@@ -104,11 +134,33 @@ if (authForm) {
                 fetchCustomers();
             }
         } catch (err) {
-            console.error("Lỗi đăng nhập:", err);
-            authErrorMsg.innerText = err.message || "Tên đăng nhập hoặc mật khẩu không chính xác.";
+            console.error("Lỗi đăng nhập chi tiết:", err);
+            const errDetail = err.message || err.error_description || (typeof err === 'object' ? JSON.stringify(err) : String(err));
+            const errCode = err.code || err.status || '';
+
+            let rawErrorBox = `
+                <div style="background: #FEF2F2; border: 1px solid #FCA5A5; padding: 14px; border-radius: 10px; text-align: left; margin-top: 12px; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);">
+                    <div style="font-size: 14px; font-weight: 800; color: #DC2626; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                        <span>❌</span> <span>Đăng Nhập Thất Bại</span>
+                    </div>
+                    <div style="font-size: 12px; color: #7F1D1D; margin-bottom: 4px; font-weight: bold;">Thông điệp lỗi từ hệ thống Supabase:</div>
+                    <div style="background: #FFFFFF; border: 1px solid #FECACA; border-radius: 6px; padding: 8px 10px; font-family: monospace; font-size: 12px; color: #B91C1C; word-break: break-all; margin-bottom: 8px;">
+                        ${errCode ? '<strong>[' + errCode + ']</strong> ' : ''}${errDetail}
+                    </div>
+                    <div style="font-size: 11px; color: #64748B; line-height: 1.5;">
+                        💡 <strong>Gợi ý khắc phục:</strong><br>
+                        • Nếu lỗi <i>Invalid login credentials</i>: Vui lòng kiểm tra lại ID/Email và Mật khẩu (chú ý gõ chữ hoa/thường).<br>
+                        • Nếu lỗi <i>Failed to fetch</i>: Do kết nối mạng bị chặn, thử chuyển sang 4G hoặc đổi DNS.
+                    </div>
+                </div>
+            `;
+
+            authErrorMsg.innerHTML = rawErrorBox;
             authErrorMsg.style.display = 'block';
-            btnSubmit.innerText = 'Đăng nhập';
-            btnSubmit.disabled = false;
+            if (btnSubmit) {
+                btnSubmit.innerText = 'Đăng nhập';
+                btnSubmit.disabled = false;
+            }
         }
     });
 }
@@ -295,12 +347,54 @@ function updateKPIBar() {
     kpiProgressFill.style.width = barWidth + '%';
 }
 
+// Quản lý bóng thoại Mochi nhắn các câu chúc cổ vũ Hiếu Hạnh
+const mochiQuotes = [
+    "Anh iu bé nhiềuuu 💕",
+    "Hiếu Hạnh của anh là giỏi nhất ✨🥰",
+    "Uống thêm nước nhoa bé 🥛💕",
+    "Nghỉ tay nhắm mắt nghỉ ngơi một xíu nhoa bé 😴💖",
+    "Hiếu Hạnh cố lên nhé 🐾🔥",
+    "Mochi luôn đồng hành cùng Hiếu Hạnh ✨",
+    "Quyết tâm cán đích 650M rực rỡ 🚀💰",
+    "Hiếu Hạnh tuyệt vời số 1! 🏆💖"
+];
+
+let mochiBubbleTimer = null;
+function showMochiBubble(customMsg) {
+    const bubble = document.getElementById('kpiCatSpeech');
+    if (!bubble) return;
+
+    if (mochiBubbleTimer) clearTimeout(mochiBubbleTimer);
+
+    const msg = customMsg || mochiQuotes[Math.floor(Math.random() * mochiQuotes.length)];
+    bubble.innerText = msg;
+    bubble.classList.add('show');
+
+    mochiBubbleTimer = setTimeout(() => {
+        bubble.classList.remove('show');
+    }, 4000);
+}
+
+// Tự động bật bóng thoại Mochi nhắn tin nhắn ngẫu nhiên mỗi 7 giây
+setInterval(() => {
+    const bubble = document.getElementById('kpiCatSpeech');
+    if (bubble && !bubble.classList.contains('show')) {
+        showMochiBubble();
+    }
+}, 7000);
+
+// Hiện bóng thoại đầu tiên sau 2 giây khi vừa mở trang
+setTimeout(() => {
+    showMochiBubble("Anh iu bé nhiềuuu 💕");
+}, 2000);
+
 document.getElementById('kpiCatRunner')?.addEventListener('click', () => {
+    showMochiBubble("Anh iu bé nhiềuuu 💕");
     const monthSales = getCurrentMonthSales();
     const pct = Math.round((monthSales / KPI_TARGET) * 100);
-    let msg = `🐾 Mochi nhắn: "Cố lên bạn ơi! Mochi đang chạy đua để cùng bạn đạt mốc KPI 650M tháng này! Hiện tại đã chạy được ${pct}% rồi nè! 🚀🔥"`;
+    let msg = `<strong style="font-size: 15px; color: #d97706;">Hiếu Hạnh cố lên nhé! 💕</strong><br><br>Mochi đang chạy đua để cùng bạn đạt mốc KPI 650M tháng này! Hiện tại đã chạy đạt <strong style="color: #10b981;">${pct}%</strong> rồi nè! 🚀🔥`;
     if (pct >= 100) {
-        msg = `🎉 Mochi nhắn: "XUẤT SẮC QUÁ! Bạn đã đưa Mochi chạy cán đích 100% chỉ tiêu KPI 650M rồi! Thật tự hào! 🥳💰"`;
+        msg = `<strong style="font-size: 15px; color: #10b981;">XUẤT SẮC QUÁ HIẾU HẠNH ƠI! 🎉</strong><br><br>Hiếu Hạnh đã đưa Mochi chạy cán đích <strong>100% chỉ tiêu KPI 650M</strong> rồi! Thật tự hào quá! 🥳💰`;
     }
     showNotification("Mochi Cổ Vũ KPI 🐾", msg);
 });
@@ -672,13 +766,7 @@ function formatDateTime(isoString) {
     return d.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
-const classificationColors = {
-    "Thường xuyên": "#2D5A27",       // Xanh Rêu Đậm (VIP / Giao dịch đều đặn)
-    "Khách mới": "#6B4F3A",          // Nâu Đất Ấm (Khách mới tiềm năng)
-    "Không thường xuyên": "#3B6978", // Xanh Phiến Đá Trầm (Thỉnh thoảng mua)
-    "Chưa liên hệ được": "#D97706",  // Vàng Hổ Phách Nổi Bật (Cần gọi chăm sóc)
-    "Không nhu cầu": "#A23900"       // Đỏ Đất Terracotta (Dừng nhu cầu)
-};
+
 
 const categoryInput = document.getElementById('category');
 const productDescInput = document.getElementById('productDesc');
