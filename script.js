@@ -433,32 +433,57 @@ async function hideLoadingBar() {
         const interval = loadingBar.dataset.interval;
         if (interval) clearInterval(parseInt(interval));
 
-        // Đảm bảo loading bar hiển thị ít nhất 1.2 giây
-        const startTime = parseInt(loadingBar.dataset.startTime) || Date.now();
-        const elapsed = Date.now() - startTime;
-        const minDisplayTime = 1200; // 1.2 giây
-        const remainingTime = Math.max(0, minDisplayTime - elapsed);
-
-        // Đợi thời gian còn lại (nếu có)
-        if (remainingTime > 0) {
-            await new Promise(resolve => setTimeout(resolve, remainingTime));
-        }
-
-        // Complete to 100%
+        // Hoàn tất 100% nhanh chóng không tạo độ trễ ảo
         loadingFill.style.width = '100%';
         loadingPercent.textContent = '100%';
 
         setTimeout(() => {
             loadingBar.style.display = 'none';
-        }, 600); // Giữ ở 100% thêm 0.6s
+        }, 150);
+    }
+}
+
+// Bộ nhớ đệm LocalStorage giúp nạp ứng dụng tức thì 0ms mà không phải chờ mạng
+const LOCAL_CACHE_KEY = 'qlds_customers_cache_v1';
+
+function loadCachedCustomers() {
+    try {
+        const cached = localStorage.getItem(LOCAL_CACHE_KEY);
+        if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                customers = parsed;
+                renderTable();
+                updateCategoryDatalist();
+                updateKPIBar();
+                return true;
+            }
+        }
+    } catch (e) {
+        console.warn("Lỗi đọc cache local:", e);
+    }
+    return false;
+}
+
+function saveCachedCustomers(data) {
+    try {
+        localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(data));
+    } catch (e) {
+        console.warn("Lỗi lưu cache local:", e);
     }
 }
 
 async function fetchCustomers() {
     const tableBody = document.getElementById('tableBody');
+    
+    // Nạp ngay dữ liệu từ Cache LocalStorage nếu có (Hiển thị tức thì 0ms)
+    const hasCache = loadCachedCustomers();
+
     try {
-        showLoadingBar(); // Hiện loading bar
-        tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang tải dữ liệu từ máy chủ Supabase...</td></tr>`;
+        if (!hasCache) {
+            showLoadingBar(); // Chỉ hiện loading bar khi chưa có cache
+            tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: var(--primary-color); padding: 30px;">Đang tải dữ liệu từ máy chủ Supabase...</td></tr>`;
+        }
 
         if (!supabaseClient) {
             throw new Error("Kết nối Supabase chưa được thiết lập. Hãy kiểm tra lỗi khởi tạo ở trên.");
@@ -471,19 +496,22 @@ async function fetchCustomers() {
 
         if (error) {
             console.error("Lỗi từ Supabase:", error);
-            await hideLoadingBar(); // Ẩn loading bar khi lỗi (có await)
-            tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
-                <b>Lỗi máy chủ:</b> ${error.message} <br>
-            </td></tr>`;
+            await hideLoadingBar();
+            if (!hasCache) {
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #ef4444; padding: 30px; line-height: 1.6;">
+                    <b>Lỗi máy chủ:</b> ${error.message} <br>
+                </td></tr>`;
+            }
             return;
         }
 
         customers = (data || []).map(mapFromSupabase);
+        saveCachedCustomers(customers); // Lưu lại bản mới nhất vào Cache LocalStorage
         renderTable();
         updateCategoryDatalist(); // Cập nhật danh sách thể loại
         updateKPIBar(); // Cập nhật thanh KPI
 
-        await hideLoadingBar(); // Ẩn loading bar khi hoàn thành (có await)
+        await hideLoadingBar(); // Ẩn loading bar khi hoàn thành
 
         // Khởi tạo custom autocomplete cho tất cả các input
         setTimeout(() => {
@@ -657,7 +685,7 @@ function formatPhoneNumber(phoneVal) {
 }
 
 function showHistoryModal(customerId) {
-    const customer = customers.find(c => c.customerId === customerId);
+    const customer = customers.find(c => String(c.customerId).toLowerCase() === String(customerId).toLowerCase());
     if (!customer) return;
 
     const metaContainer = document.getElementById('historyModalMeta');
@@ -669,7 +697,34 @@ function showHistoryModal(customerId) {
     const timelineContainer = document.getElementById('historyTimelineContainer');
     timelineContainer.innerHTML = '';
 
-    const history = customer.history || [];
+    let history = [...(customer.history || [])];
+
+    // Tự động kiểm tra và đồng bộ nếu người dùng sửa trực tiếp giá trị Doanh số (sales) trên bảng điều khiển Supabase DB
+    let historySum = history.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const targetSales = Number(customer.sales) || 0;
+
+    if (history.length === 0 && targetSales !== 0) {
+        history.push({
+            date: customer.lastUpdated || new Date().toISOString(),
+            amount: targetSales,
+            note: 'Cập nhật từ Supabase Database',
+            category: customer.category || '',
+            productDesc: customer.productDesc || '',
+            updated_by: 'Supabase DB Admin'
+        });
+    } else if (history.length > 0 && Math.abs(historySum - targetSales) > 1) {
+        // Tự động chèn dòng điều chỉnh cân bằng doanh số mới nhất sửa từ Supabase
+        const diffAmount = targetSales - historySum;
+        history.unshift({
+            date: customer.lastUpdated || new Date().toISOString(),
+            amount: diffAmount,
+            note: 'Điều chỉnh trực tiếp trên Supabase Database',
+            category: customer.category || '',
+            productDesc: customer.productDesc || '',
+            updated_by: 'Supabase DB Admin'
+        });
+    }
+
     if (history.length === 0) {
         timelineContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">Chưa có lịch sử cập nhật cho khách hàng này.</div>`;
     } else {
