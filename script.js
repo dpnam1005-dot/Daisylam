@@ -256,11 +256,11 @@ function mapFromSupabase(row) {
     const topCategory = row.product_name || '';
     const topProductDesc = row.product_description || '';
 
-    // Tự động đồng bộ tên sản phẩm & mô tả sản phẩm mới nhất sửa từ Supabase DB vào mảng lịch sử
+    // Ưu tiên lấy giá trị product_name và product_description mới nhất vừa chỉnh sửa trên Supabase DB
     parsedHistory = (parsedHistory || []).map(tx => ({
         ...tx,
-        category: tx.category || topCategory,
-        productDesc: tx.productDesc || topProductDesc
+        category: topCategory || tx.category || '',
+        productDesc: topProductDesc || tx.productDesc || ''
     }));
 
     return {
@@ -455,7 +455,7 @@ async function hideLoadingBar() {
 }
 
 // Bộ nhớ đệm LocalStorage giúp nạp ứng dụng tức thì 0ms mà không phải chờ mạng
-const LOCAL_CACHE_KEY = 'qlds_customers_cache_v1';
+const LOCAL_CACHE_KEY = 'qlds_customers_cache_v3';
 
 function loadCachedCustomers() {
     try {
@@ -807,8 +807,8 @@ function showHistoryModal(customerId) {
                 const amountPrefix = item.amount > 0 ? '+' : '';
                 detailsHtml += `<li>Biến động doanh số: <strong style="color: ${item.amount > 0 ? '#10b981' : '#ef4444'}">${amountPrefix}${formatCurrency(item.amount)}</strong></li>`;
             }
-            const finalCategory = item.category || customer.category || '';
-            const finalProductDesc = item.productDesc || customer.productDesc || '';
+            const finalCategory = customer.category || item.category || '';
+            const finalProductDesc = customer.productDesc || item.productDesc || '';
 
             const categoryText = finalCategory ? `<strong style="color: var(--primary-color);">${finalCategory}</strong>` : '<span style="color: #94a3b8;">-</span>';
             detailsHtml += `<li>Tên sản phẩm: ${categoryText}</li>`;
